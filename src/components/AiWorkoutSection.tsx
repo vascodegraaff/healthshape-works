@@ -3,6 +3,7 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { WorkoutTemplate } from "@/types/workout";
 import { getExerciseImageUrl } from "@/lib/utils";
+import AiNegotiation from "./AiNegotiation";
 
 interface AiWorkoutSectionProps {
   onWorkoutClick: (workout: WorkoutTemplate) => void;
@@ -55,6 +56,7 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
 
   return (
     <div className="mb-8">
+      <AiNegotiation />
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-accent" />
         <h2 className="text-lg font-semibold">AI Curated Workout</h2>
@@ -109,3 +111,13 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
 };
 
 export default AiWorkoutSection; 
+
+/*
+TODO
+we need to query the ai to get the recommended workout (based on our history)
+this preview will already be shown
+on click, we will show difficulty, short explanation, the target muscles, and the exercises
+if the user doesn't like it, he can select difficulty, rewrite the explanation and retoggle the target muscles
+the target muscles will be using pretty component with front and back of the body and selected muscle groups
+there should be a refresh button to get a new workout
+*/
