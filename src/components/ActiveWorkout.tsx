@@ -118,7 +118,35 @@ const ActiveWorkout = ({
       onMinimize();
     }
   };
-  
+
+  const handleAddSet = (exerciseIndex: number) => {
+    setExercises(currentExercises => {
+      const newExercises = [...currentExercises];
+      const exercise = { ...newExercises[exerciseIndex] };
+      
+      // Create new set
+      const newSet: Set = {
+        weight: 0,
+        reps: 0,
+        completed: false,
+      };
+
+      exercise.sets = [...exercise.sets, newSet];
+      newExercises[exerciseIndex] = exercise;
+
+      // Save updated exercises state
+      const savedWorkout = storage.getActiveWorkout();
+      if (savedWorkout) {
+        storage.saveActiveWorkout({
+          ...savedWorkout,
+          exercises: newExercises,
+        });
+      }
+
+      return newExercises;
+    });
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
       <SheetContent 
@@ -149,12 +177,9 @@ const ActiveWorkout = ({
               <div key={exerciseIndex} className="border-b border-border">
                 <div className="flex items-center justify-between p-4">
                   <h2 className="text-accent text-lg">{exercise.name}</h2>
-                  <div className="flex items-center gap-2">
-                    <span className="text-destructive">-100%</span>
-                    <button>
-                      <MoreHorizontal className="w-5 h-5" />
-                    </button>
-                  </div>
+                  <button>
+                    <MoreHorizontal className="w-5 h-5" />
+                  </button>
                 </div>
                 
                 <div className="px-4 pb-4">
@@ -206,6 +231,7 @@ const ActiveWorkout = ({
                   <Button 
                     variant="outline" 
                     className="w-full mt-4"
+                    onClick={() => handleAddSet(exerciseIndex)}
                   >
                     + Add Set
                   </Button>

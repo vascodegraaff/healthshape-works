@@ -1,60 +1,89 @@
 import { WorkoutTemplate } from "@/types/workout";
-import { generateId } from "@/lib/utils";
+import { generateId, getExerciseImageUrl } from "@/lib/utils";
 
 export const workoutTemplates: WorkoutTemplate[] = [
   {
     id: generateId(),
     user_id: "user_1",
-    title: "Full Body HIIT",
-    description: "High intensity full body workout",
+    title: "Upper Body Strength",
+    description: "Focus on building upper body strength",
     created_at: new Date(),
     updated_at: new Date(),
     duration: 45,
-    tags: ["HIIT", "Strength"],
+    tags: ["Strength", "Upper Body"],
     intensity: "hard",
     thumbnails: [
-      "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=160&h=160&fit=crop",
-      "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=160&h=160&fit=crop",
-      "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?w=160&h=160&fit=crop",
+      getExerciseImageUrl("Alternate_Incline_Dumbbell_Curl"),
+      getExerciseImageUrl("Alternating_Cable_Shoulder_Press"),
+      getExerciseImageUrl("Alternating_Floor_Press"),
     ],
     exercises: [
       {
-        id: generateId(),
-        name: "Burpees",
-        target_muscle: "Full Body",
+        id: "Alternate_Incline_Dumbbell_Curl",
+        name: "Alternate Incline Dumbbell Curl",
+        target_muscle: "biceps",
         sets: 3,
         order: 0,
-        image_url: "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=160&h=160&fit=crop",
+        image_url: getExerciseImageUrl("Alternate_Incline_Dumbbell_Curl"),
       },
-      // Add more exercises...
+      {
+        id: "Alternating_Cable_Shoulder_Press",
+        name: "Alternating Cable Shoulder Press",
+        target_muscle: "shoulders",
+        sets: 4,
+        order: 1,
+        image_url: getExerciseImageUrl("Alternating_Cable_Shoulder_Press"),
+      },
+      {
+        id: "Alternating_Floor_Press",
+        name: "Alternating Floor Press",
+        target_muscle: "chest",
+        sets: 3,
+        order: 2,
+        image_url: getExerciseImageUrl("Alternating_Floor_Press"),
+      },
     ],
   },
   {
     id: generateId(),
     user_id: "user_1",
-    title: "Core Crusher",
-    description: "Intense core workout",
+    title: "Core Strength",
+    description: "Build a strong core foundation",
     created_at: new Date(),
     updated_at: new Date(),
     duration: 30,
-    tags: ["Abs", "Core"],
+    tags: ["Core", "Strength"],
     intensity: "average",
     thumbnails: [
-      "https://images.unsplash.com/photo-1544216717-3bbf52512659?w=160&h=160&fit=crop",
-      "https://images.unsplash.com/photo-1600881333168-2ef49b341f30?w=160&h=160&fit=crop",
-      "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=160&h=160&fit=crop",
+      getExerciseImageUrl("Ab_Roller"),
+      getExerciseImageUrl("Air_Bike"),
+      getExerciseImageUrl("Alternate_Heel_Touchers"),
     ],
     exercises: [
       {
-        id: generateId(),
-        name: "Plank",
-        target_muscle: "Core",
+        id: "Ab_Roller",
+        name: "Ab Roller",
+        target_muscle: "abdominals",
         sets: 3,
         order: 0,
-        image_url: "https://images.unsplash.com/photo-1544216717-3bbf52512659?w=160&h=160&fit=crop",
+        image_url: getExerciseImageUrl("Ab_Roller"),
       },
-      // Add more exercises...
+      {
+        id: "Air_Bike",
+        name: "Air Bike",
+        target_muscle: "abdominals",
+        sets: 3,
+        order: 1,
+        image_url: getExerciseImageUrl("Air_Bike"),
+      },
+      {
+        id: "Alternate_Heel_Touchers",
+        name: "Alternate Heel Touchers",
+        target_muscle: "abdominals",
+        sets: 3,
+        order: 2,
+        image_url: getExerciseImageUrl("Alternate_Heel_Touchers"),
+      },
     ],
   },
-  // ... add the other templates
 ]; 

@@ -47,7 +47,7 @@ const WorkoutCard = ({ title, duration, tags, thumbnails, intensity, onClick }: 
             key={index}
             src={thumbnail}
             alt={`Exercise ${index + 1}`}
-            className="w-20 h-20 rounded-lg object-cover"
+            className="w-20 h-20 rounded-lg object-cover grayscale brightness-75"
           />
         ))}
       </div>

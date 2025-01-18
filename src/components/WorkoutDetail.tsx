@@ -1,13 +1,7 @@
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetClose } from "./ui/sheet";
-
-interface Exercise {
-  name: string;
-  sets: number;
-  targetMuscle: string;
-  image: string;
-}
+import { Sheet, SheetContent } from "./ui/sheet";
+import { Exercise } from "@/types/workout";
 
 interface WorkoutDetailProps {
   title: string;
@@ -28,7 +22,7 @@ const WorkoutDetail = ({ title, exercises, onClose, onStartWorkout, lastPerforme
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b border-border">
-            <div className="w-10" /> {/* Spacer for alignment */}
+            <div className="w-10" />
             <h1 className="text-xl font-semibold">{title}</h1>
             <button 
               onClick={onClose} 
@@ -50,9 +44,9 @@ const WorkoutDetail = ({ title, exercises, onClose, onStartWorkout, lastPerforme
               {exercises.map((exercise, index) => (
                 <div key={index} className="flex items-center gap-4 p-2 rounded-lg bg-card">
                   <img 
-                    src={exercise.image} 
+                    src={exercise.image_url} 
                     alt={exercise.name}
-                    className="w-16 h-16 rounded-lg object-cover"
+                    className="w-16 h-16 rounded-lg object-cover grayscale brightness-75"
                   />
                   <div>
                     <div className="flex items-center gap-2">
@@ -61,8 +55,8 @@ const WorkoutDetail = ({ title, exercises, onClose, onStartWorkout, lastPerforme
                         ?
                       </button>
                     </div>
-                    <p className="text-muted-foreground">{exercise.targetMuscle}</p>
-                    <p>{exercise.sets}×</p>
+                    <p className="text-muted-foreground">{exercise.target_muscle}</p>
+                    <p>{exercise.sets.length}×</p>
                   </div>
                 </div>
               ))}

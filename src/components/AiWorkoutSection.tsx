@@ -2,6 +2,7 @@ import { Sparkles } from "lucide-react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { WorkoutTemplate } from "@/types/workout";
+import { getExerciseImageUrl } from "@/lib/utils";
 
 interface AiWorkoutSectionProps {
   onWorkoutClick: (workout: WorkoutTemplate) => void;
@@ -12,36 +13,43 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
   const aiWorkout: WorkoutTemplate = {
     id: "ai-1",
     user_id: "user_1",
-    title: "AI Recommended: Upper Body Focus",
-    description: "Personalized upper body workout based on your recent activity",
+    title: "AI Recommended: Full Body",
+    description: "Personalized full body workout based on your recent activity",
     created_at: new Date(),
     updated_at: new Date(),
     duration: 45,
-    tags: ["AI Generated", "Upper Body"],
+    tags: ["AI Generated", "Full Body"],
     intensity: "hard",
     thumbnails: [
-      "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=160&h=160&fit=crop",
-      "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=160&h=160&fit=crop",
-      "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=160&h=160&fit=crop",
+      getExerciseImageUrl("Alternating_Kettlebell_Press"),
+      getExerciseImageUrl("Alternate_Hammer_Curl"),
+      getExerciseImageUrl("Alternating_Floor_Press"),
     ],
     exercises: [
       {
-        id: "ai-ex-1",
-        name: "Bench Press",
-        target_muscle: "Chest",
+        id: "Alternating_Kettlebell_Press",
+        name: "Alternating Kettlebell Press",
+        target_muscle: "shoulders",
         sets: 4,
         order: 0,
-        image_url: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=160&h=160&fit=crop",
+        image_url: getExerciseImageUrl("Alternating_Kettlebell_Press"),
       },
       {
-        id: "ai-ex-2",
-        name: "Pull-ups",
-        target_muscle: "Back",
+        id: "Alternate_Hammer_Curl",
+        name: "Alternate Hammer Curl",
+        target_muscle: "biceps",
         sets: 3,
         order: 1,
-        image_url: "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=160&h=160&fit=crop",
+        image_url: getExerciseImageUrl("Alternate_Hammer_Curl"),
       },
-      // Add more exercises as needed
+      {
+        id: "Alternating_Floor_Press",
+        name: "Alternating Floor Press",
+        target_muscle: "chest",
+        sets: 3,
+        order: 2,
+        image_url: getExerciseImageUrl("Alternating_Floor_Press"),
+      },
     ],
   };
 
@@ -84,7 +92,7 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
               key={index}
               src={thumbnail}
               alt={`Exercise ${index + 1}`}
-              className="w-20 h-20 rounded-lg object-cover"
+              className="w-20 h-20 rounded-lg object-cover grayscale brightness-75"
             />
           ))}
         </div>

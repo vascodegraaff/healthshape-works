@@ -49,18 +49,20 @@ const Index = () => {
       user_id: "user_id",
       template_id: selectedWorkout.id,
       title: selectedWorkout.title,
+      description: selectedWorkout.description,
+      created_at: selectedWorkout.created_at,
+      updated_at: selectedWorkout.updated_at,
+      duration: selectedWorkout.duration,
+      tags: selectedWorkout.tags,
+      intensity: selectedWorkout.intensity,
+      thumbnails: selectedWorkout.thumbnails,
       started_at: new Date(),
       exercises: selectedWorkout.exercises.map(exercise => ({
-        id: generateId(),
-        workout_session_id: selectedWorkout.id,
-        exercise_name: exercise.name,
-        target_muscle: exercise.target_muscle,
-        order: exercise.order,
-        sets: Array(exercise.sets).fill({
-          id: generateId(),
-          exercise_id: exercise.id,
+        ...exercise,
+        sets: Array(exercise.sets.length).fill({
           weight: 0,
           reps: 0,
+          completed: false,
         }),
       })),
     };
