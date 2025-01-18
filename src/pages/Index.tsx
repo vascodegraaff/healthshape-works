@@ -41,6 +41,10 @@ const Index = () => {
     setSelectedWorkout(workout);
   };
 
+  const handleCloseWorkoutDetail = () => {
+    setSelectedWorkout(null);
+  };
+
   const handleStartWorkout = () => {
     if (!selectedWorkout) return;
 
@@ -163,28 +167,9 @@ const Index = () => {
       {selectedWorkout && !activeWorkout && (
         <WorkoutDetail
           title={selectedWorkout.title}
-          exercises={[
-            {
-              name: "Incline Bench Press (Barbell)",
-              sets: 3,
-              targetMuscle: "Chest",
-              image: "https://example.com/bench-press.jpg",
-            },
-            {
-              name: "Seated Overhead Press (Dumbbell)",
-              sets: 3,
-              targetMuscle: "Shoulders",
-              image: "https://example.com/overhead-press.jpg",
-            },
-            {
-              name: "Chest Fly",
-              sets: 3,
-              targetMuscle: "Chest",
-              image: "https://example.com/chest-fly.jpg",
-            },
-          ]}
+          exercises={selectedWorkout.exercises}
           lastPerformed="5 May 2024"
-          onClose={handleFinishWorkout}
+          onClose={handleCloseWorkoutDetail}
           onStartWorkout={handleStartWorkout}
         />
       )}

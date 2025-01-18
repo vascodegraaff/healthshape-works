@@ -26,7 +26,7 @@ const BottomNav = () => {
               }`}
             >
               <item.icon className={`w-6 h-6 ${isActive ? "text-accent" : "text-muted-foreground"}`} />
-              <span className="text-xs">{item.label}</span>
+              {/* <span className="text-xs">{item.label}</span> */}
             </Link>
           );
         })}

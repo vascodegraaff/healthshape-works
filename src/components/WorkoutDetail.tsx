@@ -1,7 +1,8 @@
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent } from "./ui/sheet";
+import { Sheet, SheetContent, SheetClose } from "./ui/sheet";
 import { Exercise } from "@/types/workout";
+import { useState } from "react";
 
 interface WorkoutDetailProps {
   title: string;
@@ -12,8 +13,17 @@ interface WorkoutDetailProps {
 }
 
 const WorkoutDetail = ({ title, exercises, onClose, onStartWorkout, lastPerformed }: WorkoutDetailProps) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      onClose();
+    }
+  };
+
   return (
-    <Sheet open={true} onOpenChange={onClose}>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent 
         side="bottom" 
         className="h-[90vh] p-0" 
@@ -25,7 +35,7 @@ const WorkoutDetail = ({ title, exercises, onClose, onStartWorkout, lastPerforme
             <div className="w-10" />
             <h1 className="text-xl font-semibold">{title}</h1>
             <button 
-              onClick={onClose} 
+              onClick={() => handleOpenChange(false)}
               className="w-10 h-10 flex items-center justify-center"
             >
               <X className="w-5 h-5" />
