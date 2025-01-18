@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Analytics from "./pages/Analytics";
+import Camera from "./pages/Camera";
 import { useEffect } from "react";
 import { syncManager } from "@/lib/syncManager";
 
@@ -24,6 +25,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/camera" element={<Camera />} />
             <Route path="/social" element={<Index />} />
             <Route path="/profile" element={<Index />} />
           </Routes>
