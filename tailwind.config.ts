@@ -33,7 +33,7 @@ export default {
           foreground: "hsl(var(--secondary-foreground))",
         },
         success: {
-          DEFAULT: "#22c55e",
+          DEFAULT: "#0EA5E9",
           foreground: "#ffffff",
         },
         destructive: {
@@ -77,7 +77,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       backgroundImage: {
-        "gradient-primary": "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
+        "gradient-primary": "linear-gradient(135deg, #0EA5E9 0%, #0EA5E9 100%)",
       },
     },
   },

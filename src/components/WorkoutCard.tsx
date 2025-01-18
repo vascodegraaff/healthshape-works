@@ -11,21 +11,21 @@ interface WorkoutCardProps {
 
 const WorkoutCard = ({ title, duration, tags, thumbnails, onClick }: WorkoutCardProps) => {
   return (
-    <Card className="p-4 space-y-4 bg-white/80 backdrop-blur-sm hover:bg-white transition-colors cursor-pointer" onClick={onClick}>
+    <Card className="p-4 space-y-4 bg-background/80 backdrop-blur-sm hover:bg-background transition-colors cursor-pointer" onClick={onClick}>
       <div className="flex justify-between items-start">
         <div>
           <div className="flex gap-2 mb-2">
             {tags.map((tag) => (
-              <span key={tag} className="px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm">
+              <span key={tag} className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm">
                 {tag}
               </span>
             ))}
           </div>
           <h3 className="text-xl font-semibold">{duration} min</h3>
-          <p className="text-gray-600">{title}</p>
+          <p className="text-muted-foreground">{title}</p>
         </div>
-        <button className="p-2 rounded-lg bg-white shadow-sm">
-          <ArrowRight className="w-5 h-5 text-purple-600" />
+        <button className="p-2 rounded-lg bg-background shadow-sm">
+          <ArrowRight className="w-5 h-5 text-accent" />
         </button>
       </div>
       <div className="flex gap-2">
