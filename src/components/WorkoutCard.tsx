@@ -1,12 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { WorkoutTemplate } from "@/types/workout";
 
-interface WorkoutCardProps {
-  title: string;
-  duration: number;
-  tags: string[];
-  thumbnails: string[];
-  intensity?: 'recovery' | 'average' | 'hard';
+interface WorkoutCardProps extends WorkoutTemplate {
   onClick: () => void;
 }
 
@@ -14,18 +10,21 @@ const WorkoutCard = ({ title, duration, tags, thumbnails, intensity, onClick }: 
   const getIntensityColor = (intensity?: string) => {
     switch (intensity) {
       case 'recovery':
-        return 'bg-emerald-100 text-emerald-600';
+        return 'bg-emerald-950 text-emerald-400';
       case 'hard':
-        return 'bg-rose-100 text-rose-600';
+        return 'bg-rose-950 text-rose-400';
       case 'average':
-        return 'bg-amber-100 text-amber-600';
+        return 'bg-amber-950 text-amber-400';
       default:
         return 'bg-accent/10 text-accent';
     }
   };
 
   return (
-    <Card className="p-4 space-y-4 bg-background/80 backdrop-blur-sm hover:bg-background transition-colors cursor-pointer" onClick={onClick}>
+    <Card 
+      className="p-4 space-y-4 bg-card hover:bg-card/80 transition-colors cursor-pointer" 
+      onClick={onClick}
+    >
       <div className="flex justify-between items-start">
         <div>
           <div className="flex gap-2 mb-2">
