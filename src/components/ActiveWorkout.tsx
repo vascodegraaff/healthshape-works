@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MoreHorizontal, RotateCcw } from "lucide-react";
+import { MoreHorizontal, RotateCcw, Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent } from "./ui/sheet";
 import Timer from "./Timer";
@@ -238,6 +238,18 @@ const ActiveWorkout = ({
                 </div>
               </div>
             ))}
+
+            {/* Add Exercise Button */}
+            <div className="p-4">
+              <Button 
+                variant="outline" 
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => console.log("Add exercise clicked")}
+              >
+                <Plus className="w-4 h-4" />
+                Add Exercise
+              </Button>
+            </div>
           </div>
         </div>
       </SheetContent>

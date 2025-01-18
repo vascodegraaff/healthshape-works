@@ -8,6 +8,7 @@ import Analytics from "./pages/Analytics";
 import History from "./pages/History";
 import { useEffect } from "react";
 import { syncManager } from "@/lib/syncManager";
+import ExerciseLibrary from "./pages/ExerciseLibrary";
 
 const queryClient = new QueryClient();
 
@@ -25,7 +26,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/history" element={<History/>} />
-            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/exercises" element={<ExerciseLibrary />} />
             <Route path="/social" element={<Index />} />
             <Route path="/profile" element={<Index />} />
           </Routes>
