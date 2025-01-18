@@ -9,24 +9,37 @@ const Index = () => {
   
   const workouts = [
     {
-      title: "Chest & Hamstrings",
-      duration: 22,
-      tags: ["Special for you", "Gym"],
+      title: "Recovery Session",
+      duration: 20,
+      tags: ["Low Impact", "Stretching"],
       thumbnails: [
         "/placeholder.svg",
         "/placeholder.svg",
         "/placeholder.svg",
       ],
+      intensity: "recovery",
     },
     {
-      title: "Full Body Workout",
-      duration: 30,
-      tags: ["Beginner", "No Equipment"],
+      title: "Full Body Challenge",
+      duration: 45,
+      tags: ["High Intensity", "Full Body"],
       thumbnails: [
         "/placeholder.svg",
         "/placeholder.svg",
         "/placeholder.svg",
       ],
+      intensity: "hard",
+    },
+    {
+      title: "Balanced Workout",
+      duration: 30,
+      tags: ["Moderate", "Balanced"],
+      thumbnails: [
+        "/placeholder.svg",
+        "/placeholder.svg",
+        "/placeholder.svg",
+      ],
+      intensity: "average",
     },
   ];
 
@@ -50,7 +63,7 @@ const Index = () => {
           <h1 className="text-3xl font-bold text-white mb-2">
             Hi, {username}!
           </h1>
-          <p className="text-white/80">Let's get started!</p>
+          <p className="text-white/80">Choose your workout intensity for today</p>
         </div>
 
         {/* Workout Cards */}

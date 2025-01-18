@@ -6,17 +6,31 @@ interface WorkoutCardProps {
   duration: number;
   tags: string[];
   thumbnails: string[];
+  intensity?: 'recovery' | 'average' | 'hard';
   onClick: () => void;
 }
 
-const WorkoutCard = ({ title, duration, tags, thumbnails, onClick }: WorkoutCardProps) => {
+const WorkoutCard = ({ title, duration, tags, thumbnails, intensity, onClick }: WorkoutCardProps) => {
+  const getIntensityColor = (intensity?: string) => {
+    switch (intensity) {
+      case 'recovery':
+        return 'bg-emerald-100 text-emerald-600';
+      case 'hard':
+        return 'bg-rose-100 text-rose-600';
+      case 'average':
+        return 'bg-amber-100 text-amber-600';
+      default:
+        return 'bg-accent/10 text-accent';
+    }
+  };
+
   return (
     <Card className="p-4 space-y-4 bg-background/80 backdrop-blur-sm hover:bg-background transition-colors cursor-pointer" onClick={onClick}>
       <div className="flex justify-between items-start">
         <div>
           <div className="flex gap-2 mb-2">
             {tags.map((tag) => (
-              <span key={tag} className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm">
+              <span key={tag} className={`px-3 py-1 rounded-full text-sm ${getIntensityColor(intensity)}`}>
                 {tag}
               </span>
             ))}
