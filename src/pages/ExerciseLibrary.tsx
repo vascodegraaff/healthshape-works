@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import BottomNav from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { getExerciseImageUrl } from "@/lib/utils";
 import { exercises, exerciseCategories, equipmentTypes, levels, Exercise } from "@/data/exercises";
 
@@ -22,15 +23,12 @@ const getDifficultyColor = (level: string) => {
 const ExerciseLibrary = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
-  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
   const filteredExercises = exercises.filter(exercise => {
     const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = !selectedCategory || exercise.primaryMuscles.includes(selectedCategory);
-    const matchesEquipment = !selectedEquipment || exercise.equipment === selectedEquipment;
-    const matchesLevel = !selectedLevel || exercise.level === selectedLevel;
-    return matchesSearch && matchesCategory && matchesEquipment && matchesLevel;
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -72,7 +70,8 @@ const ExerciseLibrary = () => {
           {filteredExercises.map((exercise) => (
             <Card 
               key={exercise.id} 
-              className="p-3 hover:bg-card/80 transition-colors border-border/5 shadow-lg"
+              className="p-3 hover:bg-card/80 transition-colors border-border/5 shadow-lg cursor-pointer"
+              onClick={() => setSelectedExercise(exercise)}
             >
               <div className="flex items-center gap-3">
                 <img
@@ -109,6 +108,81 @@ const ExerciseLibrary = () => {
           ))}
         </div>
       </div>
+
+      {/* Exercise Detail Sheet */}
+      {selectedExercise && (
+        <Sheet open={true} onOpenChange={() => setSelectedExercise(null)}>
+          <SheetContent 
+            side="bottom" 
+            className="h-[90vh] p-0"
+            hideCloseButton
+          >
+            <div className="flex flex-col h-full">
+              {/* Header */}
+              <div className="flex justify-between items-center p-4 border-b border-border">
+                <div className="w-10" />
+                <h2 className="text-xl font-semibold">{selectedExercise.name}</h2>
+                <button 
+                  onClick={() => setSelectedExercise(null)}
+                  className="w-10 h-10 flex items-center justify-center"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 overflow-auto">
+                <div className="p-4 space-y-4">
+                  {/* Image */}
+                  <img
+                    src={getExerciseImageUrl(selectedExercise.id)}
+                    alt={selectedExercise.name}
+                    className="w-full aspect-video object-cover rounded-lg grayscale brightness-75"
+                  />
+
+                  {/* Muscle Groups */}
+                  <div>
+                    <h3 className="font-semibold mb-1">Target Muscles</h3>
+                    <p className="text-muted-foreground">
+                      {selectedExercise.primaryMuscles.join(", ")}
+                    </p>
+                  </div>
+
+                  {/* Instructions */}
+                  <div>
+                    <h3 className="font-semibold mb-2">Instructions</h3>
+                    <ol className="space-y-2 text-muted-foreground">
+                      {selectedExercise.instructions.map((instruction, index) => (
+                        <li key={index} className="flex gap-2">
+                          <span className="text-accent">{index + 1}.</span>
+                          <span>{instruction}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {/* Additional Info */}
+                  <div className="flex flex-wrap gap-2">
+                    {selectedExercise.equipment && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent">
+                        {selectedExercise.equipment}
+                      </span>
+                    )}
+                    {selectedExercise.mechanic && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent">
+                        {selectedExercise.mechanic}
+                      </span>
+                    )}
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getDifficultyColor(selectedExercise.level)}`}>
+                      {selectedExercise.level}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
 
       <BottomNav />
     </div>
