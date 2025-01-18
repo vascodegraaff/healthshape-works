@@ -60,7 +60,10 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
         <h2 className="text-lg font-semibold">AI Curated Workout</h2>
       </div>
       
-      <Card className="p-4 space-y-4 bg-card hover:bg-card/80 transition-colors cursor-pointer">
+      <Card 
+        className="p-4 space-y-4 bg-card hover:bg-card/80 transition-colors cursor-pointer" 
+        onClick={() => onWorkoutClick(aiWorkout)}
+      >
         <div className="flex justify-between items-start">
           <div>
             <div className="flex gap-2 mb-2">
