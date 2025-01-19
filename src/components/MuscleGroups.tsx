@@ -175,9 +175,9 @@ export const MuscleGroupsSVG: React.FC<MuscleGroupsSVGProps> = ({
       className="w-full h-full"
       preserveAspectRatio="xMidYMid meet"
     >
-      {MuscleGroups.map((group) => group.paths.map((path) => (
+      {MuscleGroups.map((group) => group.paths.map((path, path_id) => (
         <g 
-          key={group.id}
+          key={group.id + path_id.toString()}
           id={group.label}
           {...(!group.inactive && {
             onClick: () => onMuscleClick(group.id),
