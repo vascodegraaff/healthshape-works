@@ -74,7 +74,7 @@ const Index = () => {
   useEffect(() => {
     setWorkoutRecommendation
     const fetchWorkout = async () => {
-      const workout = await fetchAiWorkout(3, "default explanation", ["chest", "quadriceps"]);
+      const workout = await fetchAiWorkout(3, "Today we will focus on chest and quads since you've been slacking on them lately.", ["chest", "quadriceps"]);
       setWorkoutRecommendation(workout);
     };
     fetchWorkout();
@@ -168,6 +168,12 @@ const Index = () => {
     setIsWorkoutMinimized(false);
   };
 
+  const handleAiWorkoutStart = (workout: WorkoutSession) => {
+    setActiveWorkout(workout);
+    storage.saveActiveWorkout(workout);
+    setIsWorkoutMinimized(false);
+  };
+
   // Add cleanup effect
   useEffect(() => {
     return () => {
@@ -207,7 +213,7 @@ const Index = () => {
 
           {/* AI Curated Section */}
           <WorkoutContext.Provider value={{ workoutRecommendation, setWorkoutRecommendation }}>
-            <AiWorkoutSection onWorkoutClick={handleWorkoutClick} />
+            <AiWorkoutSection onWorkoutClick={handleAiWorkoutStart} />
           </WorkoutContext.Provider>
 
           {/* Quick Empty Workout */}

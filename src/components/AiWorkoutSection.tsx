@@ -3,12 +3,12 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Dialog, DialogContent } from "./ui/dialog";
-import { WorkoutTemplate } from "@/types/workout";
+import { WorkoutTemplate, WorkoutSession } from "@/types/workout";
 import { fetchAiWorkout } from "@/data/aiRequest";
 import AiNegotiation from "./AiNegotiation";
 
 interface AiWorkoutSectionProps {
-  onWorkoutClick: (workout: WorkoutTemplate) => void;
+  onWorkoutClick: (workout: WorkoutSession) => void;
 }
 
 const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
@@ -40,12 +40,12 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
                     Regenerate
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {workout.exercises.length} exercises • {workout.exercises.reduce((acc, ex) => acc + (ex.sets || 0), 0)} sets
-                </p>
+                {/* <p className="text-sm text-muted-foreground">
+                  {workout.exercises.length} exercises • {workout.exercises.reduce((acc, ex) => acc + (ex.sets ?? 0), 0)} sets
+                </p> */}
                 <Button 
                   className="w-full"
-                  onClick={() => onWorkoutClick(workout)}
+                  onClick={() => onWorkoutClick(workout as WorkoutSession)}
                 >
                   Start Workout
                 </Button>
@@ -85,7 +85,10 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
         <DialogContent className="max-w-3xl h-[90vh] p-0">
           <AiNegotiation 
             onWorkoutGenerated={(generatedWorkout) => {
-              setWorkout(generatedWorkout);
+              setWorkout(generatedWorkout as WorkoutTemplate);
+            }}
+            onStartWorkout={(workout) => {
+              onWorkoutClick(workout);
               setShowNegotiation(false);
             }}
             onClose={() => setShowNegotiation(false)}

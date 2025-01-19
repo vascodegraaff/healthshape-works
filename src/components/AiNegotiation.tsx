@@ -6,35 +6,82 @@ import { Slider } from "./ui/slider";
 import { Textarea } from "./ui/textarea";
 import { MuscleGroupsSVG } from './MuscleGroups';
 import { WorkoutContext } from '@/pages/Index';
-import { WorkoutTemplate } from "@/types/workout";
+import { WorkoutTemplate, WorkoutSession, ActiveExercise } from "@/types/workout";
 import { fetchAiWorkout } from "@/data/aiRequest";
 import { getExerciseImageUrl } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AiNegotiationProps {
-  onWorkoutGenerated: (workout: WorkoutTemplate) => void;
+  onWorkoutGenerated: (workout: WorkoutSession) => void;
   onClose: () => void;
+  onStartWorkout: (workout: WorkoutSession) => void;
 }
 
-const AiNegotiation = ({ onWorkoutGenerated, onClose }: AiNegotiationProps) => {
+const AiNegotiation = ({ onWorkoutGenerated, onClose, onStartWorkout }: AiNegotiationProps) => {
   const { workoutRecommendation, setWorkoutRecommendation } = useContext(WorkoutContext);
   const [isAdjustOpen, setIsAdjustOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [difficulty, setDifficulty] = useState(3);
   const [description, setDescription] = useState('');
   const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]);
+  const { user } = useAuth();
 
   const handleGenerateWorkout = async () => {
     setIsLoading(true);
     try {
-      const workout = await fetchAiWorkout(difficulty, description, selectedMuscles);
+      // Ensure we have at least one muscle selected
+      const targetMuscles = selectedMuscles.length > 0 
+        ? selectedMuscles 
+        : ['chest', 'quadriceps'][Math.floor(Math.random() * 3)];
+      
+      const workout = await fetchAiWorkout(
+        difficulty,
+        description,
+        Array.isArray(targetMuscles) ? targetMuscles : [targetMuscles]
+      );
       setWorkoutRecommendation(workout);
-      onWorkoutGenerated(workout);
       setIsAdjustOpen(false);
     } catch (error) {
       console.error('Failed to generate workout:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleStartWorkout = () => {
+    if (!workoutRecommendation || !user) return;
+
+    // Convert AI recommendation exercises to active exercises
+    const activeExercises: ActiveExercise[] = workoutRecommendation.exercises.map(exercise => ({
+      id: exercise.id || exercise.name.replace(/\s+/g, '_'),
+      name: exercise.name,
+      force: "push",
+      level: "beginner",
+      mechanic: null,
+      equipment: null,
+      primaryMuscles: [exercise.target_muscle],
+      secondaryMuscles: [],
+      instructions: [],
+      category: "strength",
+      images: [`${exercise.id || exercise.name.replace(/\s+/g, '_')}/0.jpg`],
+      sets: Array(exercise.sets).fill({
+        weight: exercise.weight || 0,
+        reps: exercise.reps,
+        completed: false
+      })
+    }));
+
+    const newWorkout: WorkoutSession = {
+      user_id: user.id,
+      template_id: null,
+      title: workoutRecommendation.title,
+      started_at: new Date(),
+      completed_at: null,
+      exercises: activeExercises
+    };
+
+    onStartWorkout(newWorkout);
+    onClose();
   };
 
   if (!workoutRecommendation) return null;
@@ -76,12 +123,11 @@ const AiNegotiation = ({ onWorkoutGenerated, onClose }: AiNegotiationProps) => {
                     <div className="flex-1">
                       <h4 className="font-medium">{exercise.name}</h4>
                       <p className="text-sm text-muted-foreground">
-                        {exercise.sets.map((set, i) => (
-                          <span key={i}>
-                            {set.weight === 0 ? `${set.reps} reps` : `${set.reps}×${set.weight}kg`}
-                            {i < exercise.sets.length - 1 ? ', ' : ''}
-                          </span>
-                        ))}
+                        {exercise.sets} sets × {exercise.reps} reps
+                        {exercise.weight > 0 && ` @ ${exercise.weight}kg`}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Target: {exercise.target_muscle}
                       </p>
                     </div>
                   </div>
@@ -104,7 +150,7 @@ const AiNegotiation = ({ onWorkoutGenerated, onClose }: AiNegotiationProps) => {
               <SlidersHorizontal className="w-4 h-4 mr-2" />
               Adjust Workout
             </Button>
-            <Button onClick={() => onWorkoutGenerated(workoutRecommendation)}>
+            <Button onClick={handleStartWorkout}>
               Start Workout
             </Button>
           </div>
