@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, Camera } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import BottomNav from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { getExerciseImageUrl } from "@/lib/utils";
 import { exercises, exerciseCategories, equipmentTypes, levels, Exercise } from "@/data/exercises";
+import FormCheckCamera from "@/components/FormCheckCamera";
 
 const getDifficultyColor = (level: string) => {
   switch (level) {
@@ -24,6 +25,7 @@ const ExerciseLibrary = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [isFormCheckOpen, setIsFormCheckOpen] = useState(false);
 
   const filteredExercises = exercises.filter(exercise => {
     const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -119,13 +121,18 @@ const ExerciseLibrary = () => {
         <Sheet open={true} onOpenChange={() => setSelectedExercise(null)}>
           <SheetContent 
             side="bottom" 
-            className="h-[90vh] p-0"
+            className="h-[95vh] p-0"
             hideCloseButton
           >
             <div className="flex flex-col h-full">
               {/* Header */}
               <div className="flex justify-between items-center p-4 border-b border-border">
-                <div className="w-10" />
+                <button 
+                  onClick={() => setIsFormCheckOpen(true)}
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+                >
+                  <Camera className="w-5 h-5" />
+                </button>
                 <h2 className="text-xl font-semibold">{selectedExercise.name}</h2>
                 <button 
                   onClick={() => setSelectedExercise(null)}
@@ -188,6 +195,13 @@ const ExerciseLibrary = () => {
           </SheetContent>
         </Sheet>
       )}
+
+      {/* Form Check Camera */}
+      <FormCheckCamera 
+        open={isFormCheckOpen}
+        onOpenChange={setIsFormCheckOpen}
+        exerciseName={selectedExercise?.name || ''}
+      />
 
       <BottomNav />
     </div>

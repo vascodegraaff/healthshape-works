@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MoreHorizontal, RotateCcw, Plus, Trash2, Camera } from "lucide-react";
+import { MoreHorizontal, RotateCcw, Plus, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent } from "./ui/sheet";
 import Timer from "./Timer";
@@ -18,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
-import FormCheckCamera from "./FormCheckCamera";
 
 interface Set {
   weight: number;
@@ -52,8 +51,6 @@ const ActiveWorkout = ({
   const [isOpen, setIsOpen] = useState(true);
   const [exercises, setExercises] = useState<ActiveExercise[]>(initialExercises);
   const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [selectedExerciseIndex, setSelectedExerciseIndex] = useState<number | null>(null);
 
   // Load saved exercise state
   useEffect(() => {
@@ -222,9 +219,9 @@ const ActiveWorkout = ({
     });
   };
 
-  const handleOpenCamera = (exerciseIndex: number) => {
-    setSelectedExerciseIndex(exerciseIndex);
-    setIsCameraOpen(true);
+  const handleFinishWorkout = () => {
+    // Implement the logic to finish the workout
+    console.log("Finishing workout");
   };
 
   return (
@@ -260,13 +257,6 @@ const ActiveWorkout = ({
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium">{exercise.name}</h3>
                       <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleOpenCamera(exerciseIndex)}
-                        >
-                          <Camera className="w-4 h-4" />
-                        </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
@@ -358,13 +348,6 @@ const ActiveWorkout = ({
           </div> 
         </SheetContent>
       </Sheet>
-
-      {/* Replace Camera Dialog with FormCheckCamera component */}
-      <FormCheckCamera 
-        open={isCameraOpen}
-        onOpenChange={setIsCameraOpen}
-        exerciseName={selectedExerciseIndex !== null ? exercises[selectedExerciseIndex].name : ''}
-      />
 
       <AddExerciseSheet
         open={isAddExerciseOpen}

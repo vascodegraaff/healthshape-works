@@ -6,7 +6,7 @@ import WorkoutDetail from "@/components/WorkoutDetail";
 import ActiveWorkout from "@/components/ActiveWorkout";
 import { Button } from "@/components/ui/button";
 import { storage } from "@/lib/storage";
-import { WorkoutTemplate, WorkoutSession, Exercise } from "@/types/workout";
+import { WorkoutTemplate, WorkoutSession, Exercise, ActiveExercise } from "@/types/workout";
 import { generateId } from "@/lib/utils";
 import { syncManager } from "@/lib/syncManager";
 import { workoutTemplates } from "@/data/workoutTemplates";

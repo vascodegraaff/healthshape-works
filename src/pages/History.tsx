@@ -5,15 +5,17 @@ import { format } from 'date-fns';
 import BottomNav from "@/components/BottomNav";
 import { Calendar, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useAuth } from '@/contexts/AuthContext';
 
 const History = () => {
   const [workouts, setWorkouts] = useState<WorkoutSession[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const loadWorkouts = async () => {
       try {
-        const data = await workoutService.getAllHistory();
+        const data = await workoutService.getAllHistory(user.id);
         setWorkouts(data);
       } catch (error) {
         console.error('Failed to load workouts:', error);

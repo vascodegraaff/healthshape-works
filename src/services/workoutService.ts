@@ -49,10 +49,11 @@ export const workoutService = {
     return workoutData;
   },
 
-  async getAllHistory() {
+  async getAllHistory(userId: string) {
     const { data: workouts, error: workoutsError } = await supabase
       .from('workout_sessions')
-      .select('*, workout_sets(*)');
+      .select('*, workout_sets(*)')
+      .eq('user_id', userId);
 
     if (workoutsError) throw workoutsError;
 
