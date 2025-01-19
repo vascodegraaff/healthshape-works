@@ -23,8 +23,10 @@ interface AiNegotiationProps {
 
 const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange, className }) => {
   const { workoutRecommendation, setWorkoutRecommendation } = useContext(WorkoutContext);
-  if (!workoutRecommendation)
+  if (!workoutRecommendation) {
+    console.log("workoutRecommendation", workoutRecommendation);
     return null;
+  }
 
   const [defaultWorkoutRecommendation] = useState<WorkoutResponse>({...workoutRecommendation});
   const [workoutTitle, setWorkoutTitle] = useState<string>(workoutRecommendation.title);
@@ -128,7 +130,7 @@ const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange, classN
               type="range"
               id="difficulty"
               min="1"
-              max="5"
+              max="3"
               className="w-full h-8 rounded-lg appearance-none cursor-pointer bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 touch-manipulation"
               value={difficulty}
               onChange={(e) => setDifficulty(parseInt(e.target.value))}
