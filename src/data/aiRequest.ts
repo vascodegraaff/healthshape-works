@@ -54,4 +54,4 @@ export const fetchAiWorkout = async (difficulty: number, explanation: string, mu
             });
         }, 1000);
     });
-}
+};

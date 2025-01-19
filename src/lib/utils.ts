@@ -10,4 +10,4 @@ export const generateId = () => {
 };
 
 export const getExerciseImageUrl = (exerciseId: string, imageIndex: number = 0) => 
-  `/exercises/${exerciseId}/${imageIndex}.jpg`;
+  `/exercises/${exerciseId.replace(/ /g, '_')}/${imageIndex}.jpg`;

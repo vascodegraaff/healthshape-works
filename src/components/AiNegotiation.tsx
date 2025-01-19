@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MuscleGroups, MuscleGroupsSVG } from './MuscleGroups';
+import { MuscleGroupsSVG } from './MuscleGroups';
 import {
   Dialog,
   DialogClose,
@@ -12,25 +12,37 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { fetchAiWorkout, Exercise } from "@/data/aiRequest";
+import { fetchAiWorkout, Exercise, WorkoutResponse } from "@/data/aiRequest";
 import { getExerciseImageUrl } from '@/lib/utils';
-
+import { WorkoutContext } from '@/pages/Index';
 
 interface AiNegotiationProps {
   onSelectionChange?: (selectedMuscles: string[]) => void;
+  className?: string;
 }
 
-const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange }) => {
-  // TODO fill out with first query values
-  const [workoutTitle, setWorkoutTitle] = useState<string>('TITLE');
-  const [explainerText, setExplainerText] = useState<string>('default explanation');
-  const [recommendedWorkouts, setRecommendedExercises] = useState<Exercise[]>([
-    { name: 'Dumbbell Bench Press', target_muscle: 'chest', sets: [{ weight: 20, reps: 8 }, { weight: 20, reps: 8 }, { weight: 20, reps: 8 }] },
-  ]);
+const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange, className }) => {
+  const { workoutRecommendation, setWorkoutRecommendation } = useContext(WorkoutContext);
+  if (!workoutRecommendation)
+    return null;
+
+  const [defaultWorkoutRecommendation] = useState<WorkoutResponse>({...workoutRecommendation});
+  const [workoutTitle, setWorkoutTitle] = useState<string>(workoutRecommendation.title);
+  const [explainerText, setExplainerText] = useState<string>(workoutRecommendation.description);
+  const [recommendedWorkouts, setRecommendedExercises] = useState<Exercise[]>(workoutRecommendation.exercises);
   const [difficulty, setDifficulty] = useState<number>(3);
   const [requestText, setRequestText] = useState<string>('');
   const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]);
   const [hoveredMuscle, setHoveredMuscle] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (workoutRecommendation) {
+      console.log("setting", workoutRecommendation, defaultWorkoutRecommendation);
+      setWorkoutTitle(workoutRecommendation.title);
+      setExplainerText(workoutRecommendation.description);
+      setRecommendedExercises(workoutRecommendation.exercises);
+    }
+  }, [workoutRecommendation]);
 
   const handleMuscleToggle = (muscleId: string) => {
     const newSelection = selectedMuscles.includes(muscleId)
@@ -46,7 +58,7 @@ const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange }) => {
   };
 
   return (
-    <Card className="">
+    <Card className={className}>
       <CardHeader>
         <CardTitle>Design Your Workout</CardTitle>
       </CardHeader>
@@ -86,8 +98,8 @@ const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange }) => {
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
-                      <img 
-                        src={getExerciseImageUrl(workout.name.replace(/ /g, '_'))} 
+                      <img
+                        src={getExerciseImageUrl(workout.name)}
                         alt={workout.name}
                         className="w-16 h-16 rounded-lg object-cover grayscale brightness-75"
                       />
@@ -201,9 +213,7 @@ const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange }) => {
                     <Button
                       variant="destructive"
                       onClick={() => {
-                        setWorkoutTitle('TODO'); // TODO
-                        setExplainerText(''); // TODO
-                        setRecommendedExercises([]); // TODO
+                        setWorkoutRecommendation({...defaultWorkoutRecommendation});
                         setDifficulty(3);
                         setRequestText('');
                         setSelectedMuscles([]);
@@ -219,17 +229,12 @@ const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange }) => {
             <button
               className="px-6 py-3 bg-blue-700 text-white rounded-md hover:bg-blue-800 font-bold text-lg"
               onClick={() => {
-                console.log({
-                  difficulty: difficulty,
-                  description: explainerText,
-                  selectedMuscles
-                });
                 fetchAiWorkout(difficulty, explainerText, selectedMuscles)
                   .then((workout) => {
-                    console.log(workout);
                     setWorkoutTitle(workout.title);
                     setExplainerText(workout.description);
                     setRecommendedExercises(workout.exercises);
+                    setWorkoutRecommendation(workout);
                   }
                   );
               }}

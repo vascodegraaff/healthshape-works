@@ -4,74 +4,83 @@ import { Button } from "./ui/button";
 import { WorkoutTemplate } from "@/types/workout";
 import { getExerciseImageUrl } from "@/lib/utils";
 import AiNegotiation from "./AiNegotiation";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { WorkoutContext } from "@/pages/Index";
 
 interface AiWorkoutSectionProps {
   onWorkoutClick: (workout: WorkoutTemplate) => void;
 }
 
 const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
+  const { workoutRecommendation, setWorkoutRecommendation } = useContext(WorkoutContext);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (workoutRecommendation)
+      setIsLoading(false);
+  }, [workoutRecommendation]);
   // This would eventually come from an AI recommendation system
-  const aiWorkout: WorkoutTemplate = {
-    id: "ai-1",
-    user_id: "user_1",
-    title: "AI Recommended: Full Body",
-    description: "Personalized full body workout based on your recent activity",
-    created_at: new Date(),
-    updated_at: new Date(),
-    duration: 45,
-    tags: ["AI Generated", "Full Body"],
-    intensity: "hard",
-    thumbnails: [
-      getExerciseImageUrl("Alternating_Kettlebell_Press"),
-      getExerciseImageUrl("Alternate_Hammer_Curl"),
-      getExerciseImageUrl("Alternating_Floor_Press"),
-    ],
-    exercises: [
+  const aiWorkout: WorkoutTemplate = useMemo(() => (
+    !workoutRecommendation ? null :
       {
-        id: "Alternating_Kettlebell_Press",
-        name: "Alternating Kettlebell Press",
-        target_muscle: "shoulders",
-        sets: 4,
-        order: 0,
-        image_url: getExerciseImageUrl("Alternating_Kettlebell_Press"),
-      },
-      {
-        id: "Alternate_Hammer_Curl",
-        name: "Alternate Hammer Curl",
-        target_muscle: "biceps",
-        sets: 3,
-        order: 1,
-        image_url: getExerciseImageUrl("Alternate_Hammer_Curl"),
-      },
-      {
-        id: "Alternating_Floor_Press",
-        name: "Alternating Floor Press",
-        target_muscle: "chest",
-        sets: 3,
-        order: 2,
-        image_url: getExerciseImageUrl("Alternating_Floor_Press"),
-      },
-    ],
-  };
+        id: "ai-1",
+        user_id: "user_1",
+        title: workoutRecommendation.title,
+        description: workoutRecommendation.description,
+        created_at: new Date(),
+        updated_at: new Date(),
+        duration: 45, // TODO let AI also estimate duration
+        tags: ["AI Generated"], // TODO let AI also suggest tags
+        intensity: "personalized", // TODO let AI also suggest intensity
+        thumbnails: workoutRecommendation.exercises.map((exercise) => getExerciseImageUrl(exercise.name)),
+        exercises: workoutRecommendation.exercises.map((exercise, index) => ({
+          id: exercise.name.replace(' ', '_'),
+          name: exercise.name,
+          target_muscle: exercise.target_muscle,
+          sets: exercise.sets.map((set) => ({
+            weight: set.weight,
+            reps: set.reps,
+          })),
+          order: index,
+          image_url: getExerciseImageUrl(exercise.name)
+        })),
+      }), [workoutRecommendation]);
+
+
+  if (isLoading && !workoutRecommendation) {
+    return (
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="w-5 h-5 text-accent animate-pulse" />
+          <h2 className="text-lg font-semibold">Loading AI Workout...</h2>
+        </div>
+        <Card className="p-4 space-y-4 bg-card animate-pulse">
+          <div className="h-20 bg-accent/10 rounded-lg"></div>
+        </Card>
+      </div>
+    );
+  }
+  if (!workoutRecommendation)
+    return null;
 
   return (
     <div className="mb-8">
-      <AiNegotiation />
+      <AiNegotiation className="bg-red-500" />
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-accent" />
         <h2 className="text-lg font-semibold">AI Curated Workout</h2>
       </div>
-      
-      <Card 
-        className="p-4 space-y-4 bg-card hover:bg-card/80 transition-colors cursor-pointer" 
+
+      <Card
+        className="p-4 space-y-4 bg-card hover:bg-card/80 transition-colors cursor-pointer"
         onClick={() => onWorkoutClick(aiWorkout)}
       >
         <div className="flex justify-between items-start">
           <div>
             <div className="flex gap-2 mb-2">
               {aiWorkout.tags.map((tag) => (
-                <span 
-                  key={tag} 
+                <span
+                  key={tag}
                   className="px-3 py-1 rounded-full text-sm bg-accent/10 text-accent"
                 >
                   {tag}
@@ -81,9 +90,9 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
             <h3 className="text-xl font-semibold">{aiWorkout.duration} min</h3>
             <p className="text-muted-foreground">{aiWorkout.title}</p>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             className="text-accent"
             onClick={() => onWorkoutClick(aiWorkout)}
           >
@@ -110,7 +119,7 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
   );
 };
 
-export default AiWorkoutSection; 
+export default AiWorkoutSection;
 
 /*
 TODO

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 import { Calendar, ChevronRight, Plus } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import WorkoutCard from "@/components/WorkoutCard";
@@ -13,8 +13,20 @@ import { workoutTemplates } from "@/data/workoutTemplates";
 import Timer from "@/components/Timer";
 import AiWorkoutSection from "@/components/AiWorkoutSection";
 import { workoutService } from "@/services/workoutService";
+import { fetchAiWorkout, WorkoutResponse } from "@/data/aiRequest";
+
+interface WorkoutContext {
+  workoutRecommendation: WorkoutResponse | null;
+  setWorkoutRecommendation: (workout: WorkoutResponse | null) => void;
+}
+
+export const WorkoutContext = createContext<WorkoutContext>({
+  workoutRecommendation: null,
+  setWorkoutRecommendation: () => { },
+});
 
 const Index = () => {
+  const [workoutRecommendation, setWorkoutRecommendation] = useState(null);
   const [username] = useState("Fitness Enthusiast");
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutTemplate | null>(null);
   const [activeWorkout, setActiveWorkout] = useState<WorkoutSession | null>(null);
@@ -37,6 +49,16 @@ const Index = () => {
 
     return () => clearInterval(saveInterval);
   }, [activeWorkout]);
+
+  // Add useEffect to fetch the workout
+  useEffect(() => {
+    setWorkoutRecommendation
+    const fetchWorkout = async () => {
+      const workout = await fetchAiWorkout(3, "default explanation", ["chest", "quadriceps"]);
+      setWorkoutRecommendation(workout);
+    };
+    fetchWorkout();
+  }, []);
 
   const handleWorkoutClick = (workout: WorkoutTemplate) => {
     setSelectedWorkout(workout);
@@ -136,7 +158,9 @@ const Index = () => {
           </div>
 
           {/* AI Curated Section */}
-          <AiWorkoutSection onWorkoutClick={handleWorkoutClick} />
+          <WorkoutContext.Provider value={{ workoutRecommendation, setWorkoutRecommendation }}>
+            <AiWorkoutSection onWorkoutClick={handleWorkoutClick} />
+          </WorkoutContext.Provider>
 
           {/* Regular Workout Cards */}
           <div className="space-y-4">
@@ -174,8 +198,8 @@ const Index = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Quick Start</h2>
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full flex items-center justify-center gap-2"
               onClick={handleStartEmptyWorkout}
             >
@@ -211,7 +235,7 @@ const Index = () => {
 
       {/* Minimized Workout Indicator */}
       {activeWorkout && isWorkoutMinimized && (
-        <div 
+        <div
           className="fixed bottom-20 left-4 right-4 bg-card p-4 rounded-lg shadow-lg cursor-pointer"
           onClick={() => setIsWorkoutMinimized(false)}
         >
