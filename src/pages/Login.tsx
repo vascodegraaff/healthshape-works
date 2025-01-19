@@ -31,7 +31,7 @@ const Login = () => {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
       <div className="w-full max-w-sm space-y-8">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Welcome to FitTrack</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Welcome to Motions</h1>
           <p className="text-muted-foreground">
             Track your workouts and achieve your fitness goals
           </p>

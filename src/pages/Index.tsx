@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext } from "react";
-import { Calendar, ChevronRight, Plus } from "lucide-react";
+import { Calendar, ChevronRight, Plus, Zap } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import WorkoutCard from "@/components/WorkoutCard";
 import WorkoutDetail from "@/components/WorkoutDetail";
@@ -203,6 +203,10 @@ const Index = () => {
 
           {/* Welcome Section */}
           <div className="mb-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="w-6 h-6 text-emerald-400" />
+              <span className="text-lg font-semibold text-emerald-400">Motions</span>
+            </div>
             <h1 className="text-3xl font-bold text-white mb-2">
               Welcome Back!
             </h1>
