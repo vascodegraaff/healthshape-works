@@ -17,12 +17,12 @@ export interface SyncQueueItem {
 
 export const storage = {
   getActiveWorkout: (): WorkoutSession | null => {
-    const saved = localStorage.getItem('activeWorkout');
+    const saved = localStorage.getItem(STORAGE_KEYS.ACTIVE_WORKOUT);
     return saved ? JSON.parse(saved) : null;
   },
 
   saveActiveWorkout: (workout: WorkoutSession) => {
-    localStorage.setItem('activeWorkout', JSON.stringify(workout));
+    localStorage.setItem(STORAGE_KEYS.ACTIVE_WORKOUT, JSON.stringify(workout));
   },
 
   clearActiveWorkout: (): void => {
