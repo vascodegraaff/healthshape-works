@@ -12,6 +12,7 @@ import { syncManager } from "@/lib/syncManager";
 import { workoutTemplates } from "@/data/workoutTemplates";
 import Timer from "@/components/Timer";
 import AiWorkoutSection from "@/components/AiWorkoutSection";
+import { workoutService } from "@/services/workoutService";
 
 const Index = () => {
   const [username] = useState("Fitness Enthusiast");
@@ -80,25 +81,19 @@ const Index = () => {
   const handleFinishWorkout = async () => {
     if (!activeWorkout) return;
 
-    const finishedWorkout = {
-      ...activeWorkout,
-      completed_at: new Date(),
-    };
-
     try {
-      // Try to sync immediately
-      await syncManager.syncWorkoutSession(finishedWorkout);
+      await workoutService.saveWorkout(activeWorkout);
       storage.clearActiveWorkout();
+      setActiveWorkout(null);
     } catch (error) {
+      console.error('Failed to save workout:', error);
       // Add to sync queue if failed
       storage.addToSyncQueue({
         id: generateId(),
         type: 'workout_session',
-        data: finishedWorkout,
+        data: activeWorkout,
       });
     }
-
-    setActiveWorkout(null);
   };
 
   const handleStartEmptyWorkout = () => {
