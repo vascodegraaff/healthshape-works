@@ -7,14 +7,18 @@ const createTemplateExercise = (
   name: string,
   targetMuscle: string,
   order: number,
-  sets: number = 3
+  sets: number = 3,
+  reps: number = 12,
+  weight: number = 0
 ): TemplateExercise => ({
   id,
   name,
   target_muscle: targetMuscle,
   order,
   image_url: getExerciseImageUrl(id),
-  sets
+  sets,
+  reps,
+  weight
 });
 
 export const workoutTemplates: WorkoutTemplate[] = [
@@ -33,10 +37,10 @@ export const workoutTemplates: WorkoutTemplate[] = [
       getExerciseImageUrl("Air_Bike"),
     ],
     exercises: [
-      createTemplateExercise("Weighted_Pull_Ups", "Weighted Pull Ups", "lats", 0, 3),
-      createTemplateExercise("Parallel_Bar_Dip", "Dips", "chest", 1, 3),
-      createTemplateExercise("3_4_Sit-Up", "3/4 Sit-Up", "abdominals", 3, 3),
-      createTemplateExercise("Ab_Roller", "Ab Roller", "abdominals", 4, 3),
+      createTemplateExercise("Weighted_Pull_Ups", "Weighted Pull Ups", "lats", 0, 4, 10, 20),
+      createTemplateExercise("Parallel_Bar_Dip", "Dips", "chest", 1, 3, 12, 0),
+      createTemplateExercise("3_4_Sit-Up", "3/4 Sit-Up", "abdominals", 2, 3, 15, 0),
+      createTemplateExercise("Ab_Roller", "Ab Roller", "abdominals", 3, 3, 12, 0),
     ],
   },
   {
@@ -54,9 +58,9 @@ export const workoutTemplates: WorkoutTemplate[] = [
       getExerciseImageUrl("Alternating_Floor_Press"),
     ],
     exercises: [
-      createTemplateExercise("Alternate_Incline_Dumbbell_Curl", "Alternate Incline Dumbbell Curl", "biceps", 0),
-      createTemplateExercise("Alternating_Cable_Shoulder_Press", "Alternating Cable Shoulder Press", "shoulders", 1),
-      createTemplateExercise("Alternating_Floor_Press", "Alternating Floor Press", "chest", 2),
+      createTemplateExercise("Alternate_Incline_Dumbbell_Curl", "Alternate Incline Dumbbell Curl", "biceps", 0, 4, 12, 15),
+      createTemplateExercise("Alternating_Cable_Shoulder_Press", "Alternating Cable Shoulder Press", "shoulders", 1, 3, 10, 25),
+      createTemplateExercise("Alternating_Floor_Press", "Alternating Floor Press", "chest", 2, 4, 8, 30),
     ],
   },
   {
@@ -74,9 +78,9 @@ export const workoutTemplates: WorkoutTemplate[] = [
       getExerciseImageUrl("Alternate_Heel_Touchers"),
     ],
     exercises: [
-      createTemplateExercise("Ab_Roller", "Ab Roller", "abdominals", 0),
-      createTemplateExercise("Air_Bike", "Air Bike", "abdominals", 1),
-      createTemplateExercise("Alternate_Heel_Touchers", "Alternate Heel Touchers", "abdominals", 2),
+      createTemplateExercise("Ab_Roller", "Ab Roller", "abdominals", 0, 3, 12, 0),
+      createTemplateExercise("Air_Bike", "Air Bike", "abdominals", 1, 3, 10, 0),
+      createTemplateExercise("Alternate_Heel_Touchers", "Alternate Heel Touchers", "abdominals", 2, 3, 8, 0),
     ],
   },
   {
@@ -94,10 +98,10 @@ export const workoutTemplates: WorkoutTemplate[] = [
       getExerciseImageUrl("Alternate_Leg_Diagonal_Bound"),
     ],
     exercises: [
-      createTemplateExercise("All_Fours_Quad_Stretch", "All Fours Quad Stretch", "quadriceps", 0, 2),
-      createTemplateExercise("90_90_Hamstring", "90/90 Hamstring", "hamstrings", 1, 3),
-      createTemplateExercise("Adductor", "Adductor", "adductors", 2, 3),
-      createTemplateExercise("Alternate_Leg_Diagonal_Bound", "Alternate Leg Diagonal Bound", "quadriceps", 3, 4),
+      createTemplateExercise("All_Fours_Quad_Stretch", "All Fours Quad Stretch", "quadriceps", 0, 2, 12, 0),
+      createTemplateExercise("90_90_Hamstring", "90/90 Hamstring", "hamstrings", 1, 3, 10, 0),
+      createTemplateExercise("Adductor", "Adductor", "adductors", 2, 3, 8, 0),
+      createTemplateExercise("Alternate_Leg_Diagonal_Bound", "Alternate Leg Diagonal Bound", "quadriceps", 3, 4, 12, 0),
     ],
   },
 ]; 

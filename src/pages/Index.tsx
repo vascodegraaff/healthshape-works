@@ -28,11 +28,11 @@ export const WorkoutContext = createContext<WorkoutContext>({
 
 const getMotivationalQuote = () => {
   const quotes = [
-    "The only bad workout is the one that didn't happen.",
+    // "The only bad workout is the one that didn't happen.",
     "Your body can stand almost anything. It's your mind you have to convince.",
-    "Success starts with self-discipline.",
-    "The harder you work, the better you get.",
-    "Small progress is still progress.",
+    // "Success starts with self-discipline.",
+    // "The harder you work, the better you get.",
+    // "Small progress is still progress.",
   ];
   return quotes[Math.floor(Math.random() * quotes.length)];
 };

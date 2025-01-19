@@ -28,10 +28,10 @@ export interface TemplateExercise {
   name: string;
   target_muscle: string;
   order: number;
-  image_url?: string;
-  sets?: number;
-  reps?: number;
-  weight?: number;
+  image_url: string;
+  sets: number;
+  reps: number;
+  weight: number;
 }
 
 // Exercise in an active workout (during execution)
