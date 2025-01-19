@@ -26,6 +26,17 @@ export const WorkoutContext = createContext<WorkoutContext>({
   setWorkoutRecommendation: () => { },
 });
 
+const getMotivationalQuote = () => {
+  const quotes = [
+    "The only bad workout is the one that didn't happen.",
+    "Your body can stand almost anything. It's your mind you have to convince.",
+    "Success starts with self-discipline.",
+    "The harder you work, the better you get.",
+    "Small progress is still progress.",
+  ];
+  return quotes[Math.floor(Math.random() * quotes.length)];
+};
+
 const Index = () => {
   const { user } = useAuth();
   const [workoutRecommendation, setWorkoutRecommendation] = useState(null);
@@ -41,9 +52,10 @@ const Index = () => {
     // Only restore if it exists and is not completed
     if (saved && !saved.completed_at) {
       setActiveWorkout(saved);
-    } else if (saved) {
-      // If workout exists but is completed, clear it
+    } else {
+      // Clear storage if workout exists but is completed
       storage.clearActiveWorkout();
+      setActiveWorkout(null);
     }
   }, []);
 
@@ -115,7 +127,7 @@ const Index = () => {
   };
 
   const handleFinishWorkout = async () => {
-    if (!activeWorkout) return;
+    // if (!activeWorkout) return;
 
     try {
       await workoutService.saveWorkout(activeWorkout);
@@ -123,7 +135,7 @@ const Index = () => {
       storage.clearActiveWorkout();
       // Then update state
       setActiveWorkout(null);
-      setIsWorkoutMinimized(false); // Also reset the minimized state
+      setIsWorkoutMinimized(true);
     } catch (error) {
       console.error('Failed to save workout:', error);
       // Add to sync queue if failed
@@ -156,12 +168,23 @@ const Index = () => {
     setIsWorkoutMinimized(false);
   };
 
+  // Add cleanup effect
+  useEffect(() => {
+    return () => {
+      // Clean up any completed workouts from storage when component unmounts
+      const saved = storage.getActiveWorkout();
+      if (saved?.completed_at) {
+        storage.clearActiveWorkout();
+      }
+    };
+  }, []);
+
   return (
     <>
       <div className="min-h-screen pb-20">
         <div className="container px-4 py-6">
           {/* Header */}
-          <div className="flex justify-between items-center mb-8">
+          {/* <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-white" />
               <span className="text-white opacity-80">Today</span>
@@ -170,20 +193,35 @@ const Index = () => {
               <span className="text-white">0</span>
               <div className="w-6 h-6 bg-white/20 rounded-full" />
             </div>
-          </div>
+          </div> */}
 
           {/* Welcome Section */}
-          <div className="mb-8">
+          <div className="mb-4">
             <h1 className="text-3xl font-bold text-white mb-2">
-              Hi, {user?.email || 'Guest'}!
+              Welcome Back!
             </h1>
-            <p className="text-white/80">Choose your workout intensity for today</p>
+            <p className="text-white/80 text-sm italic">
+              {getMotivationalQuote()}
+            </p>
           </div>
 
           {/* AI Curated Section */}
           <WorkoutContext.Provider value={{ workoutRecommendation, setWorkoutRecommendation }}>
             <AiWorkoutSection onWorkoutClick={handleWorkoutClick} />
           </WorkoutContext.Provider>
+
+          {/* Quick Empty Workout */}
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold mb-4">Quick Start</h2>
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+              onClick={handleStartEmptyWorkout}
+            >
+              <Plus className="w-4 h-4" />
+              Start Empty Workout
+            </Button>
+          </div>
 
           {/* Templates Section */}
           <div className="mb-8">
@@ -197,19 +235,6 @@ const Index = () => {
                 />
               ))}
             </div>
-          </div>
-
-          {/* Quick Empty Workout */}
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Quick Start</h2>
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-              onClick={handleStartEmptyWorkout}
-            >
-              <Plus className="w-4 h-4" />
-              Start Empty Workout
-            </Button>
           </div>
         </div>
 

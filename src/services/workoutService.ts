@@ -53,7 +53,8 @@ export const workoutService = {
     const { data: workouts, error: workoutsError } = await supabase
       .from('workout_sessions')
       .select('*, workout_sets(*)')
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .order('created_timestamp', { ascending: false });
 
     if (workoutsError) throw workoutsError;
 

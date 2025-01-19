@@ -1,263 +1,192 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useContext, useState } from 'react';
+import { Sparkles, Loader2, SlidersHorizontal } from 'lucide-react';
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Slider } from "./ui/slider";
+import { Textarea } from "./ui/textarea";
 import { MuscleGroupsSVG } from './MuscleGroups';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { fetchAiWorkout, Exercise, WorkoutResponse } from "@/data/aiRequest";
-import { getExerciseImageUrl } from '@/lib/utils';
 import { WorkoutContext } from '@/pages/Index';
+import { WorkoutTemplate } from "@/types/workout";
+import { fetchAiWorkout } from "@/data/aiRequest";
+import { getExerciseImageUrl } from '@/lib/utils';
 
 interface AiNegotiationProps {
-  onSelectionChange?: (selectedMuscles: string[]) => void;
-  className?: string;
+  onWorkoutGenerated: (workout: WorkoutTemplate) => void;
+  onClose: () => void;
 }
 
-const AiNegotiation: React.FC<AiNegotiationProps> = ({ onSelectionChange, className }) => {
+const AiNegotiation = ({ onWorkoutGenerated, onClose }: AiNegotiationProps) => {
   const { workoutRecommendation, setWorkoutRecommendation } = useContext(WorkoutContext);
-  if (!workoutRecommendation)
-    return null;
-
-  const [defaultWorkoutRecommendation] = useState<WorkoutResponse>({...workoutRecommendation});
-  const [workoutTitle, setWorkoutTitle] = useState<string>(workoutRecommendation.title);
-  const [explainerText, setExplainerText] = useState<string>(workoutRecommendation.description);
-  const [recommendedWorkouts, setRecommendedExercises] = useState<Exercise[]>(workoutRecommendation.exercises);
-  const [difficulty, setDifficulty] = useState<number>(3);
-  const [requestText, setRequestText] = useState<string>('');
+  const [isAdjustOpen, setIsAdjustOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [difficulty, setDifficulty] = useState(3);
+  const [description, setDescription] = useState('');
   const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]);
-  const [hoveredMuscle, setHoveredMuscle] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (workoutRecommendation) {
-      console.log("setting", workoutRecommendation, defaultWorkoutRecommendation);
-      setWorkoutTitle(workoutRecommendation.title);
-      setExplainerText(workoutRecommendation.description);
-      setRecommendedExercises(workoutRecommendation.exercises);
+  const handleGenerateWorkout = async () => {
+    setIsLoading(true);
+    try {
+      const workout = await fetchAiWorkout(difficulty, description, selectedMuscles);
+      setWorkoutRecommendation(workout);
+      onWorkoutGenerated(workout);
+      setIsAdjustOpen(false);
+    } catch (error) {
+      console.error('Failed to generate workout:', error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [workoutRecommendation]);
-
-  const handleMuscleToggle = (muscleId: string) => {
-    const newSelection = selectedMuscles.includes(muscleId)
-      ? selectedMuscles.filter(id => id !== muscleId)
-      : [...selectedMuscles, muscleId];
-
-    setSelectedMuscles(newSelection);
-    onSelectionChange?.(newSelection);
   };
 
-  const handleMuscleHover = (muscleId: string | null) => {
-    setHoveredMuscle(muscleId);
-  };
+  if (!workoutRecommendation) return null;
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>Design Your Workout</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-col gap-4">
-          {/* Title */}
-          <div className="space-y-2">
-            <label className="text-2xl font-bold">
-              {workoutTitle}
-            </label>
-          </div>
+    <>
+      <div className="flex flex-col h-full">
+        <DialogHeader className="px-6 py-4 border-b">
+          <DialogTitle className="text-2xl">Workout Plan</DialogTitle>
+        </DialogHeader>
 
-          {/* Explainer Text */}
-          <div className="space-y-2">
-            <label className="text-xl font-medium">
-              We chose this workout for you because...
-            </label>
-            <textarea
-              className="w-full min-h-[100px] p-2 border rounded-md bg-background text-foreground placeholder:text-muted-foreground"
-              placeholder="This is a personalized workout for..."
-              value={explainerText}
-              onChange={(e) => setExplainerText(e.target.value)}
-              readOnly={true}
-            />
-          </div>
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6 space-y-6">
+            {/* Title */}
+            <h2 className="text-2xl font-bold">{workoutRecommendation.title}</h2>
 
-          {/* Recommended Exercises */}
-          <div className="space-y-2">
-            <label className="text-xl font-bold">
-              Recommended Exercises
-            </label>
-            <ul className="space-y-2">
-              {recommendedWorkouts.map((workout, index) => (
-                <li
-                  key={index}
-                  className="p-3 border rounded-md bg-background hover:bg-muted/50 cursor-pointer"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={getExerciseImageUrl(workout.name)}
-                        alt={workout.name}
-                        className="w-16 h-16 rounded-lg object-cover grayscale brightness-75"
-                      />
-                      <span className="font-medium">{workout.name}</span>
+            {/* Description */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">About this workout</h3>
+              <p className="text-muted-foreground">
+                {workoutRecommendation.description}
+              </p>
+            </div>
+
+            {/* Exercise List */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Exercises</h3>
+              <div className="space-y-3">
+                {workoutRecommendation.exercises.map((exercise, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-center gap-4 p-3 rounded-lg bg-card border"
+                  >
+                    <img
+                      src={getExerciseImageUrl(exercise.name)}
+                      alt={exercise.name}
+                      className="w-16 h-16 rounded-lg object-cover grayscale brightness-75"
+                    />
+                    <div className="flex-1">
+                      <h4 className="font-medium">{exercise.name}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {exercise.sets.map((set, i) => (
+                          <span key={i}>
+                            {set.weight === 0 ? `${set.reps} reps` : `${set.reps}×${set.weight}kg`}
+                            {i < exercise.sets.length - 1 ? ', ' : ''}
+                          </span>
+                        ))}
+                      </p>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {workout.sets.map((set, i) => (
-                        <span key={i}>
-                          {set.weight === 0 ? `${set.reps}x` : `${set.reps}x${set.weight}kg`}
-                          {i < workout.sets.length - 1 ? ', ' : ''}
-                        </span>
-                      ))}
-                    </span>
                   </div>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* Difficulty slider */}
-          <div className="space-y-2">
-            <label htmlFor="difficulty" className="text-xl font-medium">
-              Difficulty Level
-            </label>
-            <input
-              type="range"
-              id="difficulty"
-              min="1"
-              max="5"
-              className="w-full h-8 rounded-lg appearance-none cursor-pointer bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 touch-manipulation"
-              value={difficulty}
-              onChange={(e) => setDifficulty(parseInt(e.target.value))}
-              style={{
-                WebkitAppearance: 'none',
-                MozAppearance: 'none',
-                appearance: 'none'
-              }}
-            />
-            <style>{`
-              input[type=range]::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                appearance: none;
-                width: 32px;
-                height: 32px;
-                background: white;
-                border-radius: 50%;
-                border: 2px solid currentColor;
-                cursor: pointer;
-                margin-top: -12px;
-              }
-              input[type=range]::-moz-range-thumb {
-                width: 32px;
-                height: 32px;
-                background: white;
-                border-radius: 50%;
-                border: 2px solid currentColor;
-                cursor: pointer;
-              }
-            `}</style>
+        {/* Footer Actions */}
+        <div className="p-6 border-t bg-muted/40">
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => setIsAdjustOpen(true)}
+            >
+              <SlidersHorizontal className="w-4 h-4 mr-2" />
+              Adjust Workout
+            </Button>
+            <Button onClick={() => onWorkoutGenerated(workoutRecommendation)}>
+              Start Workout
+            </Button>
           </div>
+        </div>
+      </div>
 
-          {/* Request Text */}
-          <div className="space-y-2">
-            <label className="text-xl font-medium">
-              Workout Description
-            </label>
-            <textarea
-              className="w-full min-h-[100px] p-2 border rounded-md bg-background text-foreground placeholder:text-muted-foreground"
-              placeholder="Describe any specific requirements or preferences for your workout"
-              value={requestText}
-              onChange={(e) => setRequestText(e.target.value)}
-            />
-          </div>
-
-          <div className="flex w-[400px]">
-            <div className="flex flex-col">
-              <label className="text-xl font-medium mb-2">
-                Focus on muscle groups...
+      {/* Adjust Workout Dialog */}
+      <Dialog open={isAdjustOpen} onOpenChange={setIsAdjustOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Adjust Workout</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Difficulty Slider */}
+            <div className="space-y-4">
+              <label className="text-sm font-medium">
+                Difficulty Level: {difficulty}
               </label>
-              <MuscleGroupsSVG
-                selectedMuscles={selectedMuscles}
-                hoveredMuscle={hoveredMuscle}
-                onMuscleClick={handleMuscleToggle}
-                onMuscleHover={handleMuscleHover}
+              <Slider
+                min={1}
+                max={5}
+                step={1}
+                value={[difficulty]}
+                onValueChange={([value]) => setDifficulty(value)}
+                className="w-full"
+              />
+            </div>
+
+            {/* Muscle Groups */}
+            <div className="space-y-4">
+              <label className="text-sm font-medium">Target Muscles</label>
+              <div className="h-[300px] border rounded-lg p-4 overflow-y-auto">
+                <MuscleGroupsSVG 
+                  selectedMuscles={selectedMuscles}
+                  onMuscleClick={(muscle) => {
+                    setSelectedMuscles(prev => 
+                      prev.includes(muscle) 
+                        ? prev.filter(m => m !== muscle)
+                        : [...prev, muscle]
+                    );
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-4">
+              <label className="text-sm font-medium">Additional Details</label>
+              <Textarea
+                placeholder="Add any specific requirements or preferences..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="min-h-[100px]"
               />
             </div>
           </div>
 
-          {/* Buttons */}
-          <div className="flex justify-between gap-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <button
-                  className="px-6 py-3 bg-red-500 text-white rounded-md hover:bg-red-600 font-bold text-lg"
-                >
-                  Reset
-                </button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Reset All Settings</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to reset all settings to default? This will clear your selected muscles, difficulty level, and workout description.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button
-                      variant="destructive"
-                      onClick={() => {
-                        setWorkoutRecommendation({...defaultWorkoutRecommendation});
-                        setDifficulty(3);
-                        setRequestText('');
-                        setSelectedMuscles([]);
-                      }}
-                    >
-                      Reset to Default AI Workout
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-
-            <button
-              className="px-6 py-3 bg-blue-700 text-white rounded-md hover:bg-blue-800 font-bold text-lg"
-              onClick={() => {
-                fetchAiWorkout(difficulty, explainerText, selectedMuscles)
-                  .then((workout) => {
-                    setWorkoutTitle(workout.title);
-                    setExplainerText(workout.description);
-                    setRecommendedExercises(workout.exercises);
-                    setWorkoutRecommendation(workout);
-                  }
-                  );
-              }}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsAdjustOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleGenerateWorkout}
+              disabled={isLoading}
             >
-              New AI Workout
-            </button>
-            <button
-              className="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 font-bold text-lg"
-              onClick={() => {/* Add confirm handler */ }} // TODO
-            >
-              Confirm & Edit
-            </button>
-
-            <button
-              className="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 font-bold text-lg"
-              onClick={() => {/* Add confirm handler */ }} // TODO
-            >
-              Confirm
-            </button>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate New Plan
+                </>
+              )}
+            </Button>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

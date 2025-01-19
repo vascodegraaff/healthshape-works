@@ -1,55 +1,48 @@
-import { ArrowRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { WorkoutTemplate } from "@/types/workout";
+import { Clock } from "lucide-react";
+import { Card } from "./ui/card";
+import { Exercise } from "@/types/workout";
 
-interface WorkoutCardProps extends WorkoutTemplate {
-  onClick: () => void;
+interface WorkoutCardProps {
+  title: string;
+  exercises: Exercise[];
+  duration?: number;
+  onClick?: () => void;
 }
 
-const WorkoutCard = ({ title, duration, tags, thumbnails, intensity, onClick }: WorkoutCardProps) => {
-  const getIntensityColor = (intensity?: string) => {
-    switch (intensity) {
-      case 'recovery':
-        return 'bg-emerald-950 text-emerald-400';
-      case 'hard':
-        return 'bg-rose-950 text-rose-400';
-      case 'average':
-        return 'bg-amber-950 text-amber-400';
-      default:
-        return 'bg-accent/10 text-accent';
-    }
-  };
-
+const WorkoutCard = ({ title, exercises, duration = 45, onClick }: WorkoutCardProps) => {
   return (
     <Card 
-      className="p-4 space-y-4 bg-card hover:bg-card/80 transition-colors cursor-pointer" 
+      className="p-4 hover:bg-card/80 transition-colors border-border/5 shadow-lg cursor-pointer"
       onClick={onClick}
     >
-      <div className="flex justify-between items-start">
-        <div>
-          <div className="flex gap-2 mb-2">
-            {tags.map((tag) => (
-              <span key={tag} className={`px-3 py-1 rounded-full text-sm ${getIntensityColor(intensity)}`}>
-                {tag}
-              </span>
-            ))}
-          </div>
-          <h3 className="text-xl font-semibold">{duration} min</h3>
-          <p className="text-muted-foreground">{title}</p>
+      <div className="space-y-2">
+        {/* Title */}
+        <h3 className="text-lg font-bold tracking-tight">
+          {title}
+        </h3>
+
+        {/* Duration */}
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Clock className="w-4 h-4" />
+          <span>{duration} min</span>
         </div>
-        <button className="p-2 rounded-lg bg-background shadow-sm">
-          <ArrowRight className="w-5 h-5 text-accent" />
-        </button>
-      </div>
-      <div className="flex gap-2">
-        {thumbnails.map((thumbnail, index) => (
-          <img
-            key={index}
-            src={thumbnail}
-            alt={`Exercise ${index + 1}`}
-            className="w-20 h-20 rounded-lg object-cover grayscale brightness-75"
-          />
-        ))}
+
+        {/* Labels */}
+        <div className="flex flex-wrap gap-1.5">
+          {exercises.slice(0, 3).map((exercise, index) => (
+            <span 
+              key={index} 
+              className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent"
+            >
+              {exercise.target_muscle}
+            </span>
+          ))}
+          {exercises.length > 3 && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent">
+              +{exercises.length - 3} more
+            </span>
+          )}
+        </div>
       </div>
     </Card>
   );
