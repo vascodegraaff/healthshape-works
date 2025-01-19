@@ -1,12 +1,13 @@
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetClose } from "./ui/sheet";
-import { Exercise } from "@/types/workout";
+import { Sheet, SheetContent } from "./ui/sheet";
+import { ExerciseDefinition } from "@/types/workout";
 import { useState } from "react";
+import { getExerciseImageUrl } from "@/lib/utils";
 
 interface WorkoutDetailProps {
   title: string;
-  exercises: Exercise[];
+  exercises: ExerciseDefinition[];
   onClose: () => void;
   onStartWorkout: () => void;
   lastPerformed?: string;
@@ -24,57 +25,43 @@ const WorkoutDetail = ({ title, exercises, onClose, onStartWorkout, lastPerforme
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetContent 
-        side="bottom" 
-        className="h-[90vh] p-0" 
-        hideCloseButton
-      >
+      <SheetContent side="bottom" className="h-[90vh]">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b border-border">
-            <div className="w-10" />
-            <h1 className="text-xl font-semibold">{title}</h1>
-            <button 
-              onClick={() => handleOpenChange(false)}
-              className="w-10 h-10 flex items-center justify-center"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">{title}</h2>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-auto p-4">
-            {lastPerformed && (
-              <div className="text-muted-foreground mb-4">
-                Last Performed: {lastPerformed}
-              </div>
-            )}
-            
-            <div className="space-y-4">
-              {exercises.map((exercise, index) => (
-                <div key={index} className="flex items-center gap-4 p-2 rounded-lg bg-card">
-                  <img 
-                    src={exercise.image_url} 
+          {/* Last performed */}
+          {lastPerformed && (
+            <p className="text-sm text-muted-foreground mb-6">
+              Last performed: {lastPerformed}
+            </p>
+          )}
+
+          {/* Exercise list */}
+          <div className="flex-1 overflow-auto">
+            {exercises.map((exercise, index) => (
+              <div key={index} className="py-4 border-t first:border-t-0">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={getExerciseImageUrl(exercise.id)}
                     alt={exercise.name}
-                    className="w-16 h-16 rounded-lg object-cover grayscale brightness-75"
+                    className="w-20 h-20 rounded-lg object-cover grayscale brightness-75"
                   />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{exercise.name}</h3>
-                      <button className="ml-auto p-1 rounded-full bg-accent/10 text-accent">
-                        ?
-                      </button>
-                    </div>
-                    <p className="text-muted-foreground">{exercise.target_muscle}</p>
-                    <p>{exercise.sets.length}×</p>
+                  <div className="flex-1">
+                    <h3 className="font-medium">{exercise.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {exercise.primaryMuscles.join(", ")}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-border">
+          <div className="mt-6">
             <Button 
               className="w-full bg-accent hover:bg-accent/90" 
               onClick={onStartWorkout}

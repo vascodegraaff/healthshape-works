@@ -6,7 +6,7 @@ import WorkoutDetail from "@/components/WorkoutDetail";
 import ActiveWorkout from "@/components/ActiveWorkout";
 import { Button } from "@/components/ui/button";
 import { storage } from "@/lib/storage";
-import { WorkoutTemplate, WorkoutSession } from "@/types/workout";
+import { WorkoutTemplate, WorkoutSession, Exercise } from "@/types/workout";
 import { generateId } from "@/lib/utils";
 import { syncManager } from "@/lib/syncManager";
 import { workoutTemplates } from "@/data/workoutTemplates";
@@ -14,6 +14,7 @@ import Timer from "@/components/Timer";
 import AiWorkoutSection from "@/components/AiWorkoutSection";
 import { workoutService } from "@/services/workoutService";
 import { fetchAiWorkout, WorkoutResponse } from "@/data/aiRequest";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface WorkoutContext {
   workoutRecommendation: WorkoutResponse | null;
@@ -26,6 +27,7 @@ export const WorkoutContext = createContext<WorkoutContext>({
 });
 
 const Index = () => {
+  const { user } = useAuth();
   const [workoutRecommendation, setWorkoutRecommendation] = useState(null);
   const [username] = useState("Fitness Enthusiast");
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutTemplate | null>(null);
@@ -36,7 +38,13 @@ const Index = () => {
   // Load active workout on mount
   useEffect(() => {
     const saved = storage.getActiveWorkout();
-    if (saved) setActiveWorkout(saved);
+    // Only restore if it exists and is not completed
+    if (saved && !saved.completed_at) {
+      setActiveWorkout(saved);
+    } else if (saved) {
+      // If workout exists but is completed, clear it
+      storage.clearActiveWorkout();
+    }
   }, []);
 
   // Auto-save active workout
@@ -69,29 +77,35 @@ const Index = () => {
   };
 
   const handleStartWorkout = () => {
-    if (!selectedWorkout) return;
+    if (!selectedWorkout || !user) return;
+
+    // Convert template exercises to active exercises
+    const activeExercises: ActiveExercise[] = selectedWorkout.exercises.map(exercise => ({
+      id: exercise.id,
+      name: exercise.name,
+      force: "push",
+      level: "beginner",
+      mechanic: null,
+      equipment: null,
+      primaryMuscles: [exercise.target_muscle],
+      secondaryMuscles: [],
+      instructions: [],
+      category: "strength",
+      images: [`${exercise.id}/0.jpg`],
+      sets: Array(exercise.sets || 3).fill({
+        weight: 0,
+        reps: 0,
+        completed: false
+      })
+    }));
 
     const newWorkout: WorkoutSession = {
-      id: generateId(),
-      user_id: "user_id",
+      user_id: user.id,
       template_id: selectedWorkout.id,
       title: selectedWorkout.title,
-      description: selectedWorkout.description,
-      created_at: selectedWorkout.created_at,
-      updated_at: selectedWorkout.updated_at,
-      duration: selectedWorkout.duration,
-      tags: selectedWorkout.tags,
-      intensity: selectedWorkout.intensity,
-      thumbnails: selectedWorkout.thumbnails,
       started_at: new Date(),
-      exercises: selectedWorkout.exercises.map(exercise => ({
-        ...exercise,
-        sets: Array(exercise.sets.length).fill({
-          weight: 0,
-          reps: 0,
-          completed: false,
-        }),
-      })),
+      completed_at: null,
+      exercises: activeExercises
     };
 
     setActiveWorkout(newWorkout);
@@ -105,8 +119,11 @@ const Index = () => {
 
     try {
       await workoutService.saveWorkout(activeWorkout);
+      // Clear storage first
       storage.clearActiveWorkout();
+      // Then update state
       setActiveWorkout(null);
+      setIsWorkoutMinimized(false); // Also reset the minimized state
     } catch (error) {
       console.error('Failed to save workout:', error);
       // Add to sync queue if failed
@@ -115,22 +132,28 @@ const Index = () => {
         type: 'workout_session',
         data: activeWorkout,
       });
+      // Even if save fails, we should still clear the active workout
+      storage.clearActiveWorkout();
+      setActiveWorkout(null);
+      setIsWorkoutMinimized(false);
     }
   };
 
   const handleStartEmptyWorkout = () => {
-    const workout = {
-      id: generateId(),
-      user_id: "user_id",
-      title: "Custom Workout",
-      exercises: [],
+    if (!user) return;
+
+    const newWorkout: WorkoutSession = {
+      user_id: user.id,
+      template_id: null,
+      title: "Quick Workout",
       started_at: new Date(),
-      created_at: new Date(),
-      updated_at: new Date(),
+      completed_at: null,
+      exercises: []  // Start with empty exercises array
     };
 
-    storage.saveActiveWorkout(workout);
-    setActiveWorkout(workout);
+    setActiveWorkout(newWorkout);
+    storage.saveActiveWorkout(newWorkout);
+    setIsWorkoutMinimized(false);
   };
 
   return (
@@ -152,7 +175,7 @@ const Index = () => {
           {/* Welcome Section */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">
-              Hi, {username}!
+              Hi, {user?.email || 'Guest'}!
             </h1>
             <p className="text-white/80">Choose your workout intensity for today</p>
           </div>
@@ -162,42 +185,23 @@ const Index = () => {
             <AiWorkoutSection onWorkoutClick={handleWorkoutClick} />
           </WorkoutContext.Provider>
 
-          {/* Regular Workout Cards */}
-          <div className="space-y-4">
-            {templates.map((workout) => (
-              <WorkoutCard
-                key={workout.id}
-                {...workout}
-                onClick={() => handleWorkoutClick(workout)}
-              />
-            ))}
-          </div>
-
-          {/* Custom Workout Button */}
-          <Button
-            variant="secondary"
-            className="w-full mt-6 bg-white/10 text-white hover:bg-white/20"
-            onClick={() => console.log("Custom workout clicked")}
-          >
-            <span>Custom workout</span>
-            <ChevronRight className="w-4 h-4 ml-2" />
-          </Button>
-
-          {/* Goals Section */}
-          <div className="mt-8 bg-white/10 rounded-lg p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-white font-semibold">Get a Strength Goal</h3>
-                <p className="text-white/80 text-sm">Complete 2 Gym workouts</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-white" />
+          {/* Templates Section */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-4">Templates</h2>
+            <div className="space-y-4">
+              {templates.map((workout, index) => (
+                <WorkoutCard
+                  key={index}
+                  {...workout}
+                  onClick={() => handleWorkoutClick(workout)}
+                />
+              ))}
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Quick Start</h2>
-            </div>
+          {/* Quick Empty Workout */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-4">Quick Start</h2>
             <Button
               variant="outline"
               className="w-full flex items-center justify-center gap-2"
@@ -212,16 +216,30 @@ const Index = () => {
         <BottomNav />
       </div>
 
+      {/* Workout Detail Sheet */}
       {selectedWorkout && !activeWorkout && (
         <WorkoutDetail
           title={selectedWorkout.title}
-          exercises={selectedWorkout.exercises}
+          exercises={selectedWorkout.exercises.map(exercise => ({
+            id: exercise.id,
+            name: exercise.name,
+            force: "push",
+            level: "beginner",
+            mechanic: null,
+            equipment: null,
+            primaryMuscles: [exercise.target_muscle],
+            secondaryMuscles: [],
+            instructions: [],
+            category: "strength",
+            images: [`${exercise.id}/0.jpg`]
+          }))}
           lastPerformed="5 May 2024"
           onClose={handleCloseWorkoutDetail}
           onStartWorkout={handleStartWorkout}
         />
       )}
 
+      {/* Active Workout Sheet */}
       {activeWorkout && !isWorkoutMinimized && (
         <ActiveWorkout
           title={activeWorkout.title}

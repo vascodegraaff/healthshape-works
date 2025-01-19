@@ -7,24 +7,58 @@ export interface User {
   };
 }
 
-export interface Set {
-  weight: number;
-  reps: number;
-  completed?: boolean;
+// Base exercise definition from JSON files
+export interface ExerciseDefinition {
+  id: string;
+  name: string;
+  force: string;
+  level: string;
+  mechanic: string | null;
+  equipment: string | null;
+  primaryMuscles: string[];
+  secondaryMuscles: string[];
+  instructions: string[];
+  category: string;
+  images: string[];
 }
 
-export interface Exercise {
+// Exercise in a workout template (for planning)
+export interface TemplateExercise {
   id: string;
   name: string;
   target_muscle: string;
-  sets: Set[];
   order: number;
-  image_url: string;
-  previousSets?: string[];
+  image_url?: string;
+  sets?: number;
+  reps?: number;
+  weight?: number;
 }
 
-export interface WorkoutTemplate {
+// Exercise in an active workout (during execution)
+export interface ActiveExercise extends ExerciseDefinition {
+  sets: Array<{
+    weight: number;
+    reps: number;
+    completed: boolean;
+  }>;
+}
+
+// Exercise set in history (after completion)
+export interface WorkoutSet {
   id: string;
+  session_id: string;
+  exercise_id: string;
+  set_number: number;
+  weight: number;
+  reps: number;
+  completed_at: string | null;
+  is_personal_record: boolean;
+  notes: string | null;
+}
+
+// Workout template
+export interface WorkoutTemplate {
+  // id: string;
   user_id: string;
   title: string;
   description: string;
@@ -34,12 +68,29 @@ export interface WorkoutTemplate {
   tags: string[];
   intensity?: string;
   thumbnails: string[];
-  exercises: Exercise[];
+  exercises: TemplateExercise[];
 }
 
-export interface WorkoutSession extends Omit<WorkoutTemplate, 'exercises'> {
-  template_id: string;
+// Active workout session
+export interface WorkoutSession {
+  user_id: string;
+  template_id: string | null;
+  title: string;
   started_at: Date;
-  completed_at?: Date;
-  exercises: Exercise[];
+  completed_at: Date | null;
+  exercises: ActiveExercise[];
+}
+
+// Completed workout in history
+export interface WorkoutHistory extends Omit<WorkoutSession, 'exercises'> {
+  sets: WorkoutSet[];
+}
+
+// User types
+export interface CurrentUser {
+  id: string;
+  username: string;
+  settings: {
+    units: 'kg' | 'lbs';
+  };
 } 

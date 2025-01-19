@@ -1,9 +1,24 @@
-import { WorkoutTemplate } from "@/types/workout";
+import { WorkoutTemplate, TemplateExercise } from "@/types/workout";
 import { generateId, getExerciseImageUrl } from "@/lib/utils";
+
+// Helper function to create template exercise
+const createTemplateExercise = (
+  id: string,
+  name: string,
+  targetMuscle: string,
+  order: number,
+  sets: number = 3
+): TemplateExercise => ({
+  id,
+  name,
+  target_muscle: targetMuscle,
+  order,
+  image_url: getExerciseImageUrl(id),
+  sets
+});
 
 export const workoutTemplates: WorkoutTemplate[] = [
   {
-    id: generateId(),
     user_id: "user_1",
     title: "Upper Body Strength",
     description: "Focus on building upper body strength",
@@ -18,34 +33,12 @@ export const workoutTemplates: WorkoutTemplate[] = [
       getExerciseImageUrl("Alternating_Floor_Press"),
     ],
     exercises: [
-      {
-        id: "Alternate_Incline_Dumbbell_Curl",
-        name: "Alternate Incline Dumbbell Curl",
-        target_muscle: "biceps",
-        sets: 3,
-        order: 0,
-        image_url: getExerciseImageUrl("Alternate_Incline_Dumbbell_Curl"),
-      },
-      {
-        id: "Alternating_Cable_Shoulder_Press",
-        name: "Alternating Cable Shoulder Press",
-        target_muscle: "shoulders",
-        sets: 4,
-        order: 1,
-        image_url: getExerciseImageUrl("Alternating_Cable_Shoulder_Press"),
-      },
-      {
-        id: "Alternating_Floor_Press",
-        name: "Alternating Floor Press",
-        target_muscle: "chest",
-        sets: 3,
-        order: 2,
-        image_url: getExerciseImageUrl("Alternating_Floor_Press"),
-      },
+      createTemplateExercise("Alternate_Incline_Dumbbell_Curl", "Alternate Incline Dumbbell Curl", "biceps", 0),
+      createTemplateExercise("Alternating_Cable_Shoulder_Press", "Alternating Cable Shoulder Press", "shoulders", 1),
+      createTemplateExercise("Alternating_Floor_Press", "Alternating Floor Press", "chest", 2),
     ],
   },
   {
-    id: generateId(),
     user_id: "user_1",
     title: "Core Strength",
     description: "Build a strong core foundation",
@@ -60,30 +53,9 @@ export const workoutTemplates: WorkoutTemplate[] = [
       getExerciseImageUrl("Alternate_Heel_Touchers"),
     ],
     exercises: [
-      {
-        id: "Ab_Roller",
-        name: "Ab Roller",
-        target_muscle: "abdominals",
-        sets: 3,
-        order: 0,
-        image_url: getExerciseImageUrl("Ab_Roller"),
-      },
-      {
-        id: "Air_Bike",
-        name: "Air Bike",
-        target_muscle: "abdominals",
-        sets: 3,
-        order: 1,
-        image_url: getExerciseImageUrl("Air_Bike"),
-      },
-      {
-        id: "Alternate_Heel_Touchers",
-        name: "Alternate Heel Touchers",
-        target_muscle: "abdominals",
-        sets: 3,
-        order: 2,
-        image_url: getExerciseImageUrl("Alternate_Heel_Touchers"),
-      },
+      createTemplateExercise("Ab_Roller", "Ab Roller", "abdominals", 0),
+      createTemplateExercise("Air_Bike", "Air Bike", "abdominals", 1),
+      createTemplateExercise("Alternate_Heel_Touchers", "Alternate Heel Touchers", "abdominals", 2),
     ],
   },
 ]; 

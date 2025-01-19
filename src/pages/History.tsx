@@ -13,7 +13,7 @@ const History = () => {
   useEffect(() => {
     const loadWorkouts = async () => {
       try {
-        const data = await workoutService.getWorkouts();
+        const data = await workoutService.getAllHistory();
         setWorkouts(data);
       } catch (error) {
         console.error('Failed to load workouts:', error);
@@ -50,7 +50,7 @@ const History = () => {
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      {format(new Date(workout.created_at), 'PP')}
+                      {format(new Date(workout.started_at), 'PP')}
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
@@ -58,7 +58,7 @@ const History = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                {/* <div className="flex gap-2">
                   {workout.tags.map((tag) => (
                     <span 
                       key={tag} 
@@ -67,11 +67,11 @@ const History = () => {
                       {tag}
                     </span>
                   ))}
-                </div>
+                </div> */}
               </div>
 
               <div className="space-y-2 text-sm">
-                {workout.exercises.map((exercise, index) => {
+                {/* {workout.sets.map((exercise, index) => {
                   const bestSet = getBestSet(exercise.sets);
                   return (
                     <div key={index} className="flex items-center justify-between py-1 border-b border-border last:border-0">
@@ -85,7 +85,8 @@ const History = () => {
                       )}
                     </div>
                   );
-                })}
+                })} */}
+                
               </div>
             </Card>
           ))}
