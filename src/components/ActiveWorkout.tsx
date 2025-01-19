@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
-import { MoreHorizontal, RotateCcw, Plus } from "lucide-react";
+import { MoreHorizontal, RotateCcw, Plus, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent } from "./ui/sheet";
 import Timer from "./Timer";
 import { storage } from "@/lib/storage";
+import AddExerciseSheet from "./AddExerciseSheet";
+import { exercises as exerciseLibrary } from "@/data/exercises";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 interface Set {
   weight: number;
@@ -36,6 +44,7 @@ const ActiveWorkout = ({
 }: ActiveWorkoutProps) => {
   const [isOpen, setIsOpen] = useState(true);
   const [exercises, setExercises] = useState(initialExercises);
+  const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false);
 
   // Load saved exercise state
   useEffect(() => {
@@ -147,6 +156,53 @@ const ActiveWorkout = ({
     });
   };
 
+  const handleAddExercise = (exerciseId: string) => {
+    // Find the exercise from the library instead of current exercises
+    const exercise = exerciseLibrary.find(e => e.id === exerciseId);
+    if (!exercise) return;
+
+    const newExercise = {
+      name: exercise.name,
+      sets: [{  // Add an initial empty set
+        weight: 0,
+        reps: 0,
+        completed: false
+      }],
+    };
+
+    setExercises(prev => {
+      const updatedExercises = [...prev, newExercise];
+      
+      // Save updated exercises state
+      const savedWorkout = storage.getActiveWorkout();
+      if (savedWorkout) {
+        storage.saveActiveWorkout({
+          ...savedWorkout,
+          exercises: updatedExercises,
+        });
+      }
+
+      return updatedExercises;
+    });
+  };
+
+  const handleRemoveExercise = (exerciseIndex: number) => {
+    setExercises(prev => {
+      const updatedExercises = prev.filter((_, index) => index !== exerciseIndex);
+      
+      // Save updated exercises state
+      const savedWorkout = storage.getActiveWorkout();
+      if (savedWorkout) {
+        storage.saveActiveWorkout({
+          ...savedWorkout,
+          exercises: updatedExercises,
+        });
+      }
+
+      return updatedExercises;
+    });
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
       <SheetContent 
@@ -177,9 +233,22 @@ const ActiveWorkout = ({
               <div key={exerciseIndex} className="border-b border-border">
                 <div className="flex items-center justify-between p-4">
                   <h2 className="text-accent text-lg">{exercise.name}</h2>
-                  <button>
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="w-5 h-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={() => handleRemoveExercise(exerciseIndex)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Remove Exercise
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 
                 <div className="px-4 pb-4">
@@ -241,18 +310,25 @@ const ActiveWorkout = ({
 
             {/* Add Exercise Button */}
             <div className="p-4">
-              <Button 
-                variant="outline" 
-                className="w-full flex items-center justify-center gap-2"
-                onClick={() => console.log("Add exercise clicked")}
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setIsAddExerciseOpen(true)}
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 mr-2" />
                 Add Exercise
               </Button>
             </div>
           </div>
         </div>
       </SheetContent>
+
+      {/* Add Exercise Sheet */}
+      <AddExerciseSheet
+        open={isAddExerciseOpen}
+        onClose={() => setIsAddExerciseOpen(false)}
+        onAddExercise={handleAddExercise}
+      />
     </Sheet>
   );
 };

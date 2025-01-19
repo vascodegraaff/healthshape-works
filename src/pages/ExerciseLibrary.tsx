@@ -32,40 +32,45 @@ const ExerciseLibrary = () => {
   });
 
   return (
-    <div className="min-h-screen pb-20">
-      <div className="container px-4 py-4">
-        {/* Header */}
-        <h1 className="text-2xl font-bold mb-4">Exercise Library</h1>
+    <div className="min-h-screen">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 bg-background z-10">
+        <div className="container px-4 py-4 space-y-4">
+          {/* Header */}
+          <h1 className="text-2xl font-bold">Exercise Library</h1>
 
-        {/* Search */}
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder="Search exercises..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Search exercises..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Categories */}
+          <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+            {exerciseCategories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
+                className={`px-3 py-1.5 rounded-full whitespace-nowrap ${
+                  selectedCategory === category
+                    ? "bg-accent text-accent-foreground"
+                    : "bg-card hover:bg-card/80"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* Categories */}
-        <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
-          {exerciseCategories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
-              className={`px-3 py-1.5 rounded-full whitespace-nowrap ${
-                selectedCategory === category
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-card hover:bg-card/80"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* Exercise List */}
+      {/* Scrollable Content */}
+      <div className="container px-4 pt-[168px] pb-20"> {/* Adjust pt value based on header height */}
         <div className="space-y-2">
           {filteredExercises.map((exercise) => (
             <Card 

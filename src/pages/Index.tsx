@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, ChevronRight } from "lucide-react";
+import { Calendar, ChevronRight, Plus } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import WorkoutCard from "@/components/WorkoutCard";
 import WorkoutDetail from "@/components/WorkoutDetail";
@@ -101,6 +101,21 @@ const Index = () => {
     setActiveWorkout(null);
   };
 
+  const handleStartEmptyWorkout = () => {
+    const workout = {
+      id: generateId(),
+      user_id: "user_id",
+      title: "Custom Workout",
+      exercises: [],
+      started_at: new Date(),
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+
+    storage.saveActiveWorkout(workout);
+    setActiveWorkout(workout);
+  };
+
   return (
     <>
       <div className="min-h-screen pb-20">
@@ -159,6 +174,20 @@ const Index = () => {
               <ChevronRight className="w-5 h-5 text-white" />
             </div>
           </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Quick Start</h2>
+            </div>
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center justify-center gap-2"
+              onClick={handleStartEmptyWorkout}
+            >
+              <Plus className="w-4 h-4" />
+              Start Empty Workout
+            </Button>
+          </div>
         </div>
 
         <BottomNav />
@@ -180,7 +209,7 @@ const Index = () => {
           exercises={activeWorkout.exercises}
           startTime={activeWorkout.started_at}
           onFinish={handleFinishWorkout}
-          onClose={handleFinishWorkout}
+          onClose={() => setActiveWorkout(null)}
           onMinimize={() => setIsWorkoutMinimized(true)}
         />
       )}
