@@ -14,14 +14,15 @@ import Timer from "@/components/Timer";
 import AiWorkoutSection from "@/components/AiWorkoutSection";
 import { workoutService } from "@/services/workoutService";
 import { fetchAiWorkout, WorkoutResponse } from "@/data/aiRequest";
+import {dummyWorkoutResponse} from "@/data/dummyWorkout.ts";
 
 interface WorkoutContext {
-  workoutRecommendation: WorkoutResponse | null;
+  workoutRecommendation: WorkoutResponse;
   setWorkoutRecommendation: (workout: WorkoutResponse | null) => void;
 }
 
 export const WorkoutContext = createContext<WorkoutContext>({
-  workoutRecommendation: null,
+  workoutRecommendation: dummyWorkoutResponse,
   setWorkoutRecommendation: () => { },
 });
 
@@ -52,8 +53,8 @@ const Index = () => {
 
   // Add useEffect to fetch the workout
   useEffect(() => {
-    setWorkoutRecommendation
     const fetchWorkout = async () => {
+      console.log("about to fetch ai workout")
       const workout = await fetchAiWorkout(3, "default explanation", ["chest", "quadriceps"]);
       setWorkoutRecommendation(workout);
     };

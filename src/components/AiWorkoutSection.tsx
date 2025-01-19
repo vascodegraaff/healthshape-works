@@ -65,7 +65,7 @@ const AiWorkoutSection = ({ onWorkoutClick }: AiWorkoutSectionProps) => {
 
   return (
     <div className="mb-8">
-      <AiNegotiation className="bg-red-500" />
+      <AiNegotiation/>
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-accent" />
         <h2 className="text-lg font-semibold">AI Curated Workout</h2>
